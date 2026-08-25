@@ -16,9 +16,11 @@ export const metadata: Metadata = {
  title: "Studio di Funzione Online | Calcolatore Gratuito",
   description:
   "Studia una funzione online gratuitamente: dominio, intersezioni, segno, derivate, crescenza, concavità, flessi e asintoti. Pensato per studenti delle scuole superiori.",
-  other: {
-    "google-adsense-account": "ca-pub-1617331160429657",
-  },
+ other: {
+  "google-adsense-account": "ca-pub-1617331160429657",
+  "google-site-verification":
+    "flYYUX0CHNonn690qI1VmBjI0ORWXDqtvjzEU1snXy8",
+},
 };
 
 export default function RootLayout({
