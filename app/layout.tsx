@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Studio di Funzione Online",
+ title: "Studio di Funzione Online | Calcolatore Gratuito",
   description:
-    "Studia una funzione matematica online: dominio, segno, derivate, crescenza, concavità e asintoti.",
+  "Studia una funzione online gratuitamente: dominio, intersezioni, segno, derivate, crescenza, concavità, flessi e asintoti. Pensato per studenti delle scuole superiori.",
   other: {
     "google-adsense-account": "ca-pub-1617331160429657",
   },
@@ -28,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="en"
+  lang="it"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
