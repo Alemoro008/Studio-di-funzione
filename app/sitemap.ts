@@ -6,5 +6,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: "https://studio-di-funzione.vercel.app",
       lastModified: new Date(),
     },
+    {
+      url: "https://studio-di-funzione.vercel.app/studio-di-funzione-online",
+      lastModified: new Date(),
+    },
   ];
 }
+
