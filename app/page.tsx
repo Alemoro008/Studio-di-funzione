@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import "katex/dist/katex.min.css";
 
 import {
@@ -261,17 +262,18 @@ export default function Home() {
         <div className="text-center">
 
           <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-blue-600">
-            Studio di funzione online
-          </p>
+  Studio di funzione online gratuito
+</p>
 
-          <h1 className="text-5xl font-bold tracking-tight text-gray-900">
-            Studia una funzione in pochi secondi
-          </h1>
+<h1 className="text-5xl font-bold tracking-tight text-gray-900">
+  Studio di funzione completo in pochi secondi
+</h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600">
-            Inserisci una funzione e ottieni uno studio completo,
-            con spiegazioni passo dopo passo.
-          </p>
+<p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600">
+  Inserisci una funzione e ottieni uno studio completo e spiegato
+  passo dopo passo: dominio, intersezioni, segno, derivate,
+  crescenza, massimi e minimi, concavità, flessi e asintoti.
+</p>
 
         </div>
 
@@ -324,6 +326,15 @@ export default function Home() {
           >
             Studia la funzione
           </button>
+          <div className="mt-5 text-center">
+  <Link
+    href="/studio-di-funzione"
+    className="font-semibold text-blue-600 hover:text-blue-700"
+  >
+    Scopri come si fa uno studio di funzione →
+  </Link>
+</div>
+        
 
           {/* =================================================
               ERRORE
