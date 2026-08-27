@@ -21,7 +21,7 @@ export default function StudioDiFunzione() {
 
         <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-gray-600">
           Lo studio di funzione permette di analizzare completamente
-          l'andamento di una funzione matematica. Scopri tutti i passaggi
+          l&apos;andamento di una funzione matematica. Scopri tutti i passaggi
           da seguire e utilizza il nostro calcolatore gratuito per ottenere
           rapidamente uno studio completo.
         </p>
@@ -42,7 +42,7 @@ export default function StudioDiFunzione() {
 
           <p className="mt-4 max-w-3xl leading-7 text-gray-600">
             Uno studio di funzione viene normalmente svolto seguendo una
-            sequenza di passaggi. L'obiettivo è ottenere tutte le
+            sequenza di passaggi. L&apos;obiettivo è ottenere tutte le
             informazioni necessarie per comprendere e rappresentare
             graficamente il comportamento della funzione.
           </p>
@@ -58,6 +58,7 @@ export default function StudioDiFunzione() {
                 funzione è definita. Bisogna controllare denominatori,
                 radici e tutte le altre condizioni di esistenza.
               </p>
+
               <Link
                 href="/dominio-di-una-funzione"
                 className="mt-3 inline-block font-semibold text-blue-600"
@@ -71,8 +72,8 @@ export default function StudioDiFunzione() {
                 2. Trovare le intersezioni con gli assi
               </h3>
               <p className="mt-2 leading-7 text-gray-600">
-                Si cercano le intersezioni con l'asse x ponendo f(x) = 0
-                e con l'asse y considerando x = 0 quando questo valore
+                Si cercano le intersezioni con l&apos;asse x ponendo f(x) = 0
+                e con l&apos;asse y considerando x = 0 quando questo valore
                 appartiene al dominio.
               </p>
             </article>
@@ -96,6 +97,13 @@ export default function StudioDiFunzione() {
                 decrescenza della funzione e di individuare eventuali
                 punti critici.
               </p>
+
+              <Link
+                href="/derivata-prima"
+                className="mt-3 inline-block font-semibold text-blue-600"
+              >
+                Approfondisci la derivata prima →
+              </Link>
             </article>
 
             <article className="rounded-2xl border border-gray-200 p-6">
@@ -160,33 +168,54 @@ export default function StudioDiFunzione() {
           </h2>
 
           <p className="mt-4 leading-7 text-gray-600">
-            Lo studio di funzione permette di raccogliere in un'unica
-            analisi tutte le informazioni necessarie per capire l'andamento
+            Lo studio di funzione permette di raccogliere in un&apos;unica
+            analisi tutte le informazioni necessarie per capire l&apos;andamento
             di una funzione e per costruirne il grafico qualitativo.
-            È uno degli strumenti fondamentali dell'analisi matematica
+            È uno degli strumenti fondamentali dell&apos;analisi matematica
             affrontata negli ultimi anni delle scuole superiori.
           </p>
         </section>
 
         <section className="mt-16 border-t border-gray-200 pt-10">
           <h2 className="text-2xl font-bold text-gray-900">
-            Approfondimenti
+            Approfondisci lo studio di funzione
           </h2>
 
-          <div className="mt-5 flex flex-col gap-3">
+          <p className="mt-3 max-w-3xl text-gray-600">
+            Approfondisci i principali argomenti dello studio di funzione
+            e utilizza il calcolatore online per verificare i tuoi risultati.
+          </p>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+
+            <Link
+              href="/dominio-di-una-funzione"
+              className="rounded-xl border border-gray-200 p-5 font-semibold text-blue-600 hover:bg-gray-50"
+            >
+              Dominio di una funzione →
+            </Link>
+
+            <Link
+              href="/derivata-prima"
+              className="rounded-xl border border-gray-200 p-5 font-semibold text-blue-600 hover:bg-gray-50"
+            >
+              Derivata prima →
+            </Link>
+
             <Link
               href="/studio-di-funzione-online"
-              className="font-semibold text-blue-600"
+              className="rounded-xl border border-gray-200 p-5 font-semibold text-blue-600 hover:bg-gray-50"
             >
               Studio di funzione online →
             </Link>
 
             <Link
-              href="/dominio-di-una-funzione"
-              className="font-semibold text-blue-600"
+              href="/"
+              className="rounded-xl border border-blue-200 bg-blue-50 p-5 font-semibold text-blue-600 hover:bg-blue-100"
             >
-              Dominio di una funzione →
+              Prova il calcolatore gratuito →
             </Link>
+
           </div>
         </section>
 
