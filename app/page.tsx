@@ -653,6 +653,92 @@ export default function Home() {
 
         </div>
 
+{/* =================================================
+    CONTENUTO INFORMATIVO SEO
+    ================================================= */}
+
+<section className="mx-auto mt-20 max-w-4xl">
+
+  <div className="text-center">
+    <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+      Studio di funzione online
+    </h2>
+
+    <p className="mx-auto mt-4 max-w-2xl text-gray-600">
+      Uno strumento gratuito per studiare una funzione matematica
+      passo dopo passo e comprendere i principali elementi dell'analisi.
+    </p>
+  </div>
+
+  <div className="mt-10 grid gap-6 md:grid-cols-2">
+
+    <div className="rounded-2xl border border-gray-200 p-6">
+      <h3 className="text-xl font-semibold text-gray-900">
+        Dominio di una funzione
+      </h3>
+
+      <p className="mt-3 text-gray-600">
+        Il dominio è l'insieme dei valori di x per cui una funzione
+        è definita. Per determinarlo bisogna individuare eventuali
+        denominatori nulli, radicandi negativi o altre condizioni
+        che limitano i valori ammessi.
+      </p>
+    </div>
+
+    <div className="rounded-2xl border border-gray-200 p-6">
+      <h3 className="text-xl font-semibold text-gray-900">
+        Derivata prima
+      </h3>
+
+      <p className="mt-3 text-gray-600">
+        La derivata prima permette di studiare la crescita e la
+        decrescita della funzione e di individuare eventuali
+        punti critici, massimi e minimi relativi.
+      </p>
+    </div>
+
+    <div className="rounded-2xl border border-gray-200 p-6">
+      <h3 className="text-xl font-semibold text-gray-900">
+        Limiti e asintoti
+      </h3>
+
+      <p className="mt-3 text-gray-600">
+        Lo studio dei limiti permette di analizzare il comportamento
+        della funzione vicino ai punti esclusi dal dominio e per x
+        che tende a più o meno infinito, individuando eventuali
+        asintoti verticali, orizzontali e obliqui.
+      </p>
+    </div>
+
+    <div className="rounded-2xl border border-gray-200 p-6">
+      <h3 className="text-xl font-semibold text-gray-900">
+        Segno, concavità e flessi
+      </h3>
+
+      <p className="mt-3 text-gray-600">
+        Lo studio del segno permette di capire dove la funzione è
+        positiva o negativa. La derivata seconda permette invece
+        di analizzare concavità, convessità ed eventuali punti di
+        flesso.
+      </p>
+    </div>
+
+  </div>
+
+  <div className="mt-10 rounded-2xl bg-gray-50 p-6 text-center">
+    <h3 className="text-xl font-semibold text-gray-900">
+      Come fare uno studio di funzione?
+    </h3>
+
+    <p className="mx-auto mt-3 max-w-2xl text-gray-600">
+      Inserisci la funzione nel calcolatore qui sopra per ottenere
+      automaticamente dominio, intersezioni con gli assi, studio
+      del segno, derivate, punti critici, crescenza, concavità,
+      flessi e asintoti.
+    </p>
+  </div>
+
+</section>
         <p className="mt-8 text-center text-sm text-gray-500">
           Gratuito • Pensato per studenti delle scuole superiori
         </p>
