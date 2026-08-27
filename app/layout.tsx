@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description:
   "Studia una funzione online gratuitamente: dominio, intersezioni, segno, derivate, crescenza, concavità, flessi e asintoti. Pensato per studenti delle scuole superiori.",
  other: {
-  "google-adsense-account": "ca-pub-1617331160429657",
+"google-adsense-account": "ca-pub-2763131369198778",
   "google-site-verification":
     "flYYUX0CHNonn690qI1VmBjI0ORWXDqtvjzEU1snXy8",
 },
