@@ -1,15 +1,32 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = "https://studio-di-funzione.vercel.app";
+
   return [
     {
-      url: "https://studio-di-funzione.vercel.app",
+      url: baseUrl,
       lastModified: new Date(),
     },
     {
-      url: "https://studio-di-funzione.vercel.app/studio-di-funzione-online",
+      url: `${baseUrl}/studio-di-funzione-online`,
+      lastModified: new Date(),
+    },
+    {
+      url: `${baseUrl}/studio-di-funzione`,
+      lastModified: new Date(),
+    },
+    {
+      url: `${baseUrl}/dominio-di-una-funzione`,
+      lastModified: new Date(),
+    },
+    {
+      url: `${baseUrl}/derivata-prima`,
+      lastModified: new Date(),
+    },
+    {
+      url: `${baseUrl}/segno-di-una-funzione`,
       lastModified: new Date(),
     },
   ];
 }
-
