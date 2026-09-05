@@ -36,5 +36,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/chi-siamo`,
       lastModified: new Date(),
     },
+    {
+  url: `${baseUrl}/contatti`,
+  lastModified: new Date(),
+},
   ];
 }
