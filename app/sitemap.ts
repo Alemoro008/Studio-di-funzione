@@ -28,5 +28,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/segno-di-una-funzione`,
       lastModified: new Date(),
     },
+    {
+      url: `${baseUrl}/privacy-policy`,
+      lastModified: new Date(),
+    },
+    {
+      url: `${baseUrl}/chi-siamo`,
+      lastModified: new Date(),
+    },
   ];
 }
