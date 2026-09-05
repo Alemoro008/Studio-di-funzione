@@ -45,14 +45,71 @@ export default function PrivacyPolicy() {
 
           <section>
             <h2 className="text-xl font-semibold mb-2">
-              Cookie e servizi di terze parti
+              Cookie e tecnologie simili
             </h2>
             <p>
               Il sito può utilizzare cookie tecnici necessari al suo
-              funzionamento. Qualora vengano introdotti servizi di analisi,
-              pubblicità o altri servizi di terze parti che utilizzano cookie
-              o tecnologie analoghe, questa informativa verrà aggiornata e,
-              quando richiesto, verrà acquisito il consenso dell'utente.
+              funzionamento e, previo consenso quando richiesto dalla
+              normativa applicabile, cookie o tecnologie simili utilizzati
+              da servizi di terze parti.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-2">
+              Google AdSense
+            </h2>
+            <p>
+              Il sito utilizza o potrà utilizzare Google AdSense, un servizio
+              pubblicitario fornito da Google, per la visualizzazione di
+              annunci pubblicitari.
+            </p>
+
+            <p className="mt-3">
+              Google e i suoi partner possono utilizzare cookie o tecnologie
+              simili per mostrare annunci, misurare le prestazioni degli
+              annunci e, quando previsto e autorizzato dall&apos;utente,
+              personalizzare i contenuti pubblicitari.
+            </p>
+
+            <p className="mt-3">
+              Alcune informazioni relative al dispositivo e alla navigazione,
+              come l&apos;indirizzo IP, il tipo di browser, identificatori
+              online e dati relativi all&apos;interazione con gli annunci,
+              possono essere trattate da Google e dai suoi partner secondo
+              le rispettive informative sulla privacy.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-2">
+              Consenso per gli utenti europei
+            </h2>
+            <p>
+              Per gli utenti dello Spazio Economico Europeo, del Regno Unito
+              e della Svizzera, il sito utilizza una piattaforma di gestione
+              del consenso per consentire all&apos;utente di accettare,
+              rifiutare o gestire le proprie preferenze relative a cookie,
+              annunci e servizi di terze parti.
+            </p>
+
+            <p className="mt-3">
+              Le preferenze espresse dall&apos;utente possono essere
+              modificate attraverso gli strumenti di gestione del consenso
+              messi a disposizione sul sito.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-2">
+              Servizi di terze parti
+            </h2>
+            <p>
+              Il sito può avvalersi di servizi forniti da soggetti terzi
+              necessari per l&apos;hosting, la sicurezza, la pubblicità o
+              altre funzionalità tecniche. Tali soggetti possono trattare
+              dati secondo le proprie informative e nel rispetto della
+              normativa applicabile.
             </p>
           </section>
 
@@ -73,7 +130,8 @@ export default function PrivacyPolicy() {
             </h2>
             <p>
               La presente Privacy Policy potrà essere aggiornata in seguito
-              all'introduzione di nuove funzionalità o servizi.
+              all&apos;introduzione di nuove funzionalità, servizi o
+              modifiche normative.
             </p>
           </section>
         </div>
