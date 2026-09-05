@@ -251,7 +251,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white text-gray-900">
 
       <section className="mx-auto max-w-5xl px-6 py-20">
 
@@ -303,12 +303,12 @@ export default function Home() {
               }
             }}
             placeholder="Es. (x^2 - 4) / (x - 2)"
-            className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
+           className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500"
           />
 
           {funzione && (
             <div
-              className="mt-6 min-h-16 rounded-xl bg-gray-50 p-4"
+             className="mt-6 min-h-16 rounded-xl bg-gray-50 p-4 text-gray-900"
               dangerouslySetInnerHTML={{
                 __html:
                   anteprimaMatematica(
