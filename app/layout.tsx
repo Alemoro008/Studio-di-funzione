@@ -69,8 +69,28 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
-      </body>
+  {children}
+
+  <footer className="mt-auto border-t border-gray-200 bg-white">
+    <div className="mx-auto max-w-6xl px-6 py-6 text-center text-sm text-gray-700">
+      <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+        <a href="/chi-siamo" className="hover:underline">
+          Chi siamo
+        </a>
+        <a href="/contatti" className="hover:underline">
+          Contatti
+        </a>
+        <a href="/privacy-policy" className="hover:underline">
+          Privacy Policy
+        </a>
+      </nav>
+
+      <p className="mt-4">
+        © {new Date().getFullYear()} Studio di Funzione
+      </p>
+    </div>
+  </footer>
+</body>
     </html>
   );
 }
