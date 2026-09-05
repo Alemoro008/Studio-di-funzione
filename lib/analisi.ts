@@ -1374,6 +1374,37 @@ export function calcolaConcavita(
     const esclusi =
       trovaEsclusioni(funzione);
 
+      /*
+ * Verifica se la derivata seconda
+ * è numericamente uguale a zero.
+ */
+const puntiControllo = [
+  -10, -5, -1, 0, 1, 3, 5, 10
+];
+
+const valoriControllo = puntiControllo
+  .filter(
+    (x) =>
+      !esclusi.some(
+        (e) => Math.abs(e - x) < 0.001
+      )
+  )
+  .map(
+    (x) => valutaFunzione(seconda, x)
+  )
+  .filter(
+    (v): v is number => v !== null
+  );
+
+if (
+  valoriControllo.length > 0 &&
+  valoriControllo.every(
+    (v) => Math.abs(v) < 1e-9
+  )
+) {
+  return "Né concava né convessa; nessun punto di flesso";
+}
+
     const punti: number[] = [];
 
     let precedenteX = -100;
@@ -1581,6 +1612,37 @@ export function calcolaFlessi(
 
     const esclusi =
       trovaEsclusioni(funzione);
+      /*
+ * Se la derivata seconda è numericamente
+ * uguale a zero, non ci sono punti di flesso.
+ */
+const puntiControlloFlessi = [
+  -10, -5, -1, 0, 1, 3, 5, 10
+];
+
+const valoriControlloFlessi = puntiControlloFlessi
+  .filter(
+    (x) =>
+      !esclusi.some(
+        (e) => Math.abs(e - x) < 0.001
+      )
+  )
+  .map(
+    (x) => valutaFunzione(seconda, x)
+  )
+  .filter(
+    (v): v is number => v !== null
+  );
+
+if (
+  valoriControlloFlessi.length > 0 &&
+  valoriControlloFlessi.every(
+    (v) => Math.abs(v) < 1e-9
+  )
+) {
+  return "Nessun flesso trovato";
+}
+
 
     const zeri: number[] = [];
 
