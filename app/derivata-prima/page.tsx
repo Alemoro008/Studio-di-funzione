@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
+  alternates: { canonical: "/derivata-prima" },
   title: "Derivata Prima: Come si Calcola e a Cosa Serve",
   description:
     "Scopri cos'è la derivata prima, come si calcola e come usarla nello studio di funzione per trovare crescenza, decrescenza, massimi e minimi.",
@@ -20,7 +21,7 @@ export default function DerivataPrima() {
         </h1>
 
         <p className="mt-6 max-w-3xl text-lg leading-8 text-gray-600">
-          La derivata prima è uno degli strumenti fondamentali dell'analisi
+          La derivata prima è uno degli strumenti fondamentali dell&apos;analisi
           matematica. Permette di studiare come varia una funzione e di
           individuare intervalli di crescenza e decrescenza, oltre a
           possibili massimi e minimi relativi.
@@ -37,7 +38,7 @@ export default function DerivataPrima() {
 
         <section className="mt-16">
           <h2 className="text-3xl font-bold text-gray-900">
-            Che cos'è la derivata prima?
+            Che cos&apos;è la derivata prima?
           </h2>
 
           <p className="mt-4 max-w-3xl leading-7 text-gray-600">
@@ -66,11 +67,11 @@ export default function DerivataPrima() {
             </h3>
 
             <div className="mt-4 space-y-3 text-lg text-gray-700">
-              <p>(xⁿ)' = n · xⁿ⁻¹</p>
-              <p>(sin x)' = cos x</p>
-              <p>(cos x)' = −sin x</p>
-              <p>(eˣ)' = eˣ</p>
-              <p>(ln x)' = 1/x</p>
+              <p>(xⁿ)&apos; = n · xⁿ⁻¹</p>
+              <p>(sin x)&apos; = cos x</p>
+              <p>(cos x)&apos; = −sin x</p>
+              <p>(eˣ)&apos; = eˣ</p>
+              <p>(ln x)&apos; = 1/x</p>
             </div>
           </div>
         </section>
@@ -83,7 +84,7 @@ export default function DerivataPrima() {
           <p className="mt-4 max-w-3xl leading-7 text-gray-600">
             Nello studio di funzione, dopo aver determinato il dominio,
             le intersezioni e il segno, la derivata prima viene utilizzata
-            principalmente per analizzare l'andamento della funzione.
+            principalmente per analizzare l&apos;andamento della funzione.
           </p>
 
           <div className="mt-8 space-y-5">
@@ -95,7 +96,7 @@ export default function DerivataPrima() {
 
               <p className="mt-2 leading-7 text-gray-600">
                 Se la derivata prima è positiva in un intervallo, la funzione
-                è crescente in quell'intervallo.
+                è crescente in quell&apos;intervallo.
               </p>
             </article>
 
@@ -106,7 +107,7 @@ export default function DerivataPrima() {
 
               <p className="mt-2 leading-7 text-gray-600">
                 Se la derivata prima è negativa in un intervallo, la funzione
-                è decrescente in quell'intervallo.
+                è decrescente in quell&apos;intervallo.
               </p>
             </article>
 
@@ -145,10 +146,10 @@ export default function DerivataPrima() {
 
           <p className="mt-4 max-w-3xl leading-7 text-gray-600">
             Consideriamo la funzione f(x) = x². La sua derivata prima è
-            f'(x) = 2x. La derivata è negativa per x &lt; 0, nulla per x = 0
+            f&apos;(x) = 2x. La derivata è negativa per x &lt; 0, nulla per x = 0
             e positiva per x &gt; 0. Di conseguenza la funzione è decrescente
             prima di 0 e crescente dopo 0, mostrando un minimo relativo
-            nell'origine.
+            nell&apos;origine.
           </p>
         </section>
 
