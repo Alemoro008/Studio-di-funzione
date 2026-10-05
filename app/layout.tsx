@@ -77,7 +77,7 @@ export default function RootLayout({
   <footer className="mt-auto border-t border-gray-200 bg-white">
     <div className="mx-auto max-w-6xl px-6 py-6 text-center text-sm text-gray-700">
       <nav aria-label="Guide di matematica" className="mb-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-blue-700">
-        {pagine.slice(0,6).map(p => <Link key={p.percorso} href={p.percorso}>{p.titolo}</Link>)}
+        {pagine.filter(p => !["/chi-siamo", "/contatti", "/privacy-policy"].includes(p.percorso)).map(p => <Link key={p.percorso} href={p.percorso}>{p.titolo}</Link>)}
       </nav>
       <nav aria-label="Informazioni sul sito" className="flex flex-wrap justify-center gap-x-6 gap-y-2">
         <a href="/chi-siamo" className="hover:underline">

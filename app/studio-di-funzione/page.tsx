@@ -36,6 +36,10 @@ export default function StudioDiFunzione() {
           </Link>
         </div>
 
+        <nav aria-label="Approfondimenti ed esempi" className="mt-10 flex flex-wrap gap-5 font-semibold text-blue-600">
+          <Link href="/limiti-e-asintoti">Limiti e asintoti: metodo ed esercizi →</Link>
+          <Link href="/studi-di-funzione-svolti">Tre studi completi con grafici →</Link>
+        </nav>
         <section className="mt-16">
           <h2 className="text-3xl font-bold text-gray-900">
             Come si fa uno studio di funzione?

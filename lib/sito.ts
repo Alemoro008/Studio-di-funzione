@@ -6,6 +6,8 @@ export const pagine = [
   { percorso: "/dominio-di-una-funzione", titolo: "Dominio" },
   { percorso: "/segno-di-una-funzione", titolo: "Segno" },
   { percorso: "/derivata-prima", titolo: "Derivata prima" },
+  { percorso: "/limiti-e-asintoti", titolo: "Limiti e asintoti" },
+  { percorso: "/studi-di-funzione-svolti", titolo: "Studi svolti" },
   { percorso: "/chi-siamo", titolo: "Chi siamo" },
   { percorso: "/contatti", titolo: "Contatti" },
   { percorso: "/privacy-policy", titolo: "Privacy Policy" },
