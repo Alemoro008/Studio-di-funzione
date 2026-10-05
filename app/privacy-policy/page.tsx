@@ -61,13 +61,14 @@ export default function PrivacyPolicy() {
               Google AdSense
             </h2>
             <p>
-              Il sito utilizza o potrà utilizzare Google AdSense, un servizio
-              pubblicitario fornito da Google, per la visualizzazione di
-              annunci pubblicitari.
+              Nella versione attuale non è attivo il codice di pubblicazione
+              degli annunci Google AdSense. Il sito contiene un identificativo
+              dell&apos;account AdSense destinato alla verifica del sito: questo
+              identificativo, da solo, non pubblica annunci.
             </p>
 
             <p className="mt-3">
-              Google e i suoi partner possono utilizzare cookie o tecnologie
+              Se il servizio pubblicitario verrà attivato, Google e i suoi partner potranno utilizzare cookie o tecnologie
               simili per mostrare annunci, misurare le prestazioni degli
               annunci e, quando previsto e autorizzato dall&apos;utente,
               personalizzare i contenuti pubblicitari.
@@ -77,7 +78,7 @@ export default function PrivacyPolicy() {
               Alcune informazioni relative al dispositivo e alla navigazione,
               come l&apos;indirizzo IP, il tipo di browser, identificatori
               online e dati relativi all&apos;interazione con gli annunci,
-              possono essere trattate da Google e dai suoi partner secondo
+              potranno essere trattate da Google e dai suoi partner secondo
               le rispettive informative sulla privacy.
             </p>
           </section>
@@ -87,17 +88,19 @@ export default function PrivacyPolicy() {
               Consenso per gli utenti europei
             </h2>
             <p>
-              Per gli utenti dello Spazio Economico Europeo, del Regno Unito
-              e della Svizzera, il sito utilizza una piattaforma di gestione
-              del consenso per consentire all&apos;utente di accettare,
-              rifiutare o gestire le proprie preferenze relative a cookie,
-              annunci e servizi di terze parti.
+              Nella versione attuale non è presente una piattaforma di
+              gestione del consenso e non sono integrati script pubblicitari
+              o strumenti di analisi delle visite nel codice del sito.
             </p>
 
             <p className="mt-3">
-              Le preferenze espresse dall&apos;utente possono essere
-              modificate attraverso gli strumenti di gestione del consenso
-              messi a disposizione sul sito.
+              Prima di introdurre servizi che richiedono il consenso,
+              saranno aggiornate questa informativa e le modalità di gestione
+              delle preferenze. Per gli annunci personalizzati destinati agli
+              utenti dello Spazio Economico Europeo, del Regno Unito e della
+              Svizzera, dovrà essere configurata una piattaforma di gestione
+              del consenso certificata da Google. Al momento non è disponibile
+              sul sito un comando per modificare preferenze pubblicitarie.
             </p>
           </section>
 
