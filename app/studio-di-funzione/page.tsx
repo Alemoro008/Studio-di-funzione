@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
+  alternates: { canonical: "/studio-di-funzione" },
   title: "Studio di Funzione | Come si Fa e Calcolatore Online",
   description:
     "Studio di funzione completo spiegato passo passo: dominio, intersezioni, segno, derivate, crescenza, estremi, concavità, flessi e asintoti. Prova il calcolatore online gratuito.",
