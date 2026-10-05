@@ -474,6 +474,17 @@ export function calcolaDominio(
     Radice semplice
   */
 
+  if (f === "sqrt(x)") return "[0, +∞)";
+
+  // For log(x ± c), the argument must be strictly positive.
+  const logaritmo = f.match(/^log\(x(?:([+-])(\d+(?:\.\d+)?))?\)$/);
+  if (logaritmo) {
+    const soglia = logaritmo[2]
+      ? (logaritmo[1] === "+" ? -1 : 1) * Number(logaritmo[2])
+      : 0;
+    return `(${numeroPulito(soglia)}, +∞)`;
+  }
+
   const radice =
     f.match(/^sqrt\((.*)\)$/);
 
@@ -496,7 +507,7 @@ export function calcolaDominio(
         return `[${numero}, +∞)`;
       }
 
-      return `(-∞, ${-numero}]`;
+      return `[${-numero}, +∞)`;
     }
   }
 

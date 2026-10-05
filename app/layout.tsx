@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
+import { pagine, sitoUrl } from "../lib/sito";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(sitoUrl),
   title: "Studio di Funzione Online | Calcolatore Gratuito",
 
   description:
@@ -73,7 +76,10 @@ export default function RootLayout({
 
   <footer className="mt-auto border-t border-gray-200 bg-white">
     <div className="mx-auto max-w-6xl px-6 py-6 text-center text-sm text-gray-700">
-      <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+      <nav aria-label="Guide di matematica" className="mb-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-blue-700">
+        {pagine.slice(0,6).map(p => <Link key={p.percorso} href={p.percorso}>{p.titolo}</Link>)}
+      </nav>
+      <nav aria-label="Informazioni sul sito" className="flex flex-wrap justify-center gap-x-6 gap-y-2">
         <a href="/chi-siamo" className="hover:underline">
           Chi siamo
         </a>

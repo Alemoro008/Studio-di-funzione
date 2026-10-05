@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
+  alternates: { canonical: "/segno-di-una-funzione" },
   title: "Segno di una Funzione: Come si Studia | Guida",
   description:
     "Scopri come si studia il segno di una funzione: dominio, zeri, intervalli positivi e negativi ed esempi. Guida semplice per lo studio di funzione.",

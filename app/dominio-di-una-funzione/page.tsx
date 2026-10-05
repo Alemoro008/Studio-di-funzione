@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
+  alternates: { canonical: "/dominio-di-una-funzione" },
   title: "Dominio di una Funzione | Guida e Studio Completo",
   description:
     "Scopri come trovare il dominio di una funzione e come svolgere uno studio di funzione completo con dominio, intersezioni, segno, derivate, concavità e asintoti.",
@@ -22,7 +23,7 @@ export default function DominioDiUnaFunzione() {
         <p className="mt-6 text-lg leading-8 text-gray-600">
           Il dominio è uno dei primi passaggi dello studio di una funzione.
           Scopri come determinarlo, quali condizioni controllare e come
-          proseguire con l'analisi completa della funzione.
+          proseguire con l&apos;analisi completa della funzione.
         </p>
 
         <div className="mt-8">
@@ -38,13 +39,13 @@ export default function DominioDiUnaFunzione() {
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900">
-              Cos'è il dominio di una funzione?
+              Cos&apos;è il dominio di una funzione?
             </h2>
 
             <p className="mt-3 leading-7 text-gray-600">
-              Il dominio è l'insieme di tutti i valori reali che possono
+              Il dominio è l&apos;insieme di tutti i valori reali che possono
               essere utilizzati al posto della variabile x senza rendere
-              priva di significato l'espressione della funzione.
+              priva di significato l&apos;espressione della funzione.
               Determinare il dominio è normalmente il primo passaggio
               dello studio di una funzione.
             </p>
@@ -115,7 +116,7 @@ export default function DominioDiUnaFunzione() {
             <p className="mt-3 leading-7 text-gray-600">
               Una volta determinato il dominio, lo studio di funzione
               prosegue con diversi passaggi che permettono di comprendere
-              completamente l'andamento della funzione.
+              completamente l&apos;andamento della funzione.
             </p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -159,7 +160,7 @@ export default function DominioDiUnaFunzione() {
                 <strong>Asintoti</strong>
                 <p className="mt-1 text-sm text-gray-600">
                   Descrivono il comportamento della funzione vicino ai
-                  valori esclusi e all'infinito.
+                  valori esclusi e all&apos;infinito.
                 </p>
               </div>
 

@@ -1,4 +1,5 @@
 export const metadata = {
+  alternates: { canonical: "/contatti" },
   title: "Contatti | Studio di Funzione",
   description:
     "Contatti del progetto Studio di Funzione.",

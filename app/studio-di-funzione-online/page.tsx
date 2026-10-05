@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Studio di Funzione Online | Calcolatore Gratuito",
+  alternates: { canonical: "/studio-di-funzione-online" },
+  title: "Come usare il calcolatore | Studio di Funzione Online",
   description:
     "Studio di funzione online gratuito: calcola dominio, intersezioni, segno, derivate, crescenza, concavità, flessi e asintoti.",
 };
@@ -39,16 +40,16 @@ export default function StudioDiFunzioneOnline() {
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900">
-              Cos'è lo studio di funzione?
+              Cos&apos;è lo studio di funzione?
             </h2>
 
             <p className="mt-3 leading-7 text-gray-600">
               Lo studio di funzione è un procedimento matematico che permette
-              di analizzare in modo completo l'andamento di una funzione.
+              di analizzare in modo completo l&apos;andamento di una funzione.
               Attraverso diversi passaggi è possibile capire dove la funzione
               è definita, dove è positiva o negativa, come cresce o decresce
               e quale comportamento assume vicino ai punti importanti e
-              all'infinito.
+              all&apos;infinito.
             </p>
           </section>
 
@@ -76,8 +77,8 @@ export default function StudioDiFunzioneOnline() {
                   2. Intersezioni con gli assi
                 </h3>
                 <p className="mt-2 leading-7 text-gray-600">
-                  Le intersezioni con l'asse x si trovano ponendo la funzione
-                  uguale a zero, mentre per l'intersezione con l'asse y si
+                  Le intersezioni con l&apos;asse x si trovano ponendo la funzione
+                  uguale a zero, mentre per l&apos;intersezione con l&apos;asse y si
                   considera x uguale a zero quando questo valore appartiene
                   al dominio.
                 </p>
