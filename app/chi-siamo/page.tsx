@@ -1,4 +1,5 @@
 export const metadata = {
+  alternates: { canonical: "/chi-siamo" },
   title: "Chi siamo | Studio di Funzione",
   description:
     "Scopri il progetto Studio di Funzione e gli strumenti didattici dedicati allo studio delle funzioni matematiche.",
@@ -15,7 +16,7 @@ export default function ChiSiamo() {
         <div className="space-y-6">
           <p>
             Studio di Funzione è un progetto didattico dedicato alla
-            matematica, nato con l'obiettivo di rendere più semplice e
+            matematica, nato con l&apos;obiettivo di rendere più semplice e
             comprensibile lo studio delle funzioni.
           </p>
 
@@ -27,14 +28,14 @@ export default function ChiSiamo() {
           </p>
 
           <p>
-            L'obiettivo è offrire un supporto pratico agli studenti,
+            L&apos;obiettivo è offrire un supporto pratico agli studenti,
             affiancando ai calcoli automatici spiegazioni chiare che
             aiutino a comprendere il procedimento matematico.
           </p>
 
           <p>
             Il progetto viene sviluppato e aggiornato progressivamente,
-            con l'intento di aggiungere nuovi strumenti e migliorare
+            con l&apos;intento di aggiungere nuovi strumenti e migliorare
             continuamente la qualità dei contenuti disponibili.
           </p>
 
