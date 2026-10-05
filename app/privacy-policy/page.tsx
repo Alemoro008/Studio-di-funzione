@@ -1,4 +1,5 @@
 export const metadata = {
+  alternates: { canonical: "/privacy-policy" },
   title: "Privacy Policy | Studio di Funzione",
   description:
     "Informativa sulla privacy del sito Studio di Funzione.",
