@@ -9,7 +9,7 @@ import {
 } from "react";
 
 import {
-  simplify,
+  parse,
 } from "mathjs";
 
 import katex from "katex";
@@ -33,7 +33,7 @@ function anteprimaMatematica(
       );
 
     const espressione =
-      simplify(
+      parse(
         normalizzata
       );
 
@@ -376,6 +376,7 @@ export default function Home() {
 
               <GraficoFunzione key={risultato.funzione} funzione={risultato.funzione} />
 
+              <p className="text-sm text-gray-500">Zeri, punti stazionari e flessi: ricerca numerica in [-100, 100], salvo polinomi. Il campionamento può perdere soluzioni; gli intervalli indicati dipendono dai punti trovati. Gli asintoti sono stime numeriche.</p>
               {/* DOMINIO */}
 
               <div className="rounded-xl bg-gray-50 p-5">
@@ -762,3 +763,4 @@ export default function Home() {
     </main>
   );
 }
+
