@@ -1,2497 +1,277 @@
-import {
-  derivative,
-  evaluate,
-  simplify,
-} from "mathjs";
+import { parse, derivative, simplify, type MathNode } from "mathjs";
 
-/* =========================================================
-   UTILITÀ
-   ========================================================= */
-
-function numeroPulito(numero: number): string {
-  if (!Number.isFinite(numero)) {
-    return "non definito";
-  }
-
-  const tolleranza = 0.0001;
-
-  // Numeri interi
-  if (
-    Math.abs(numero - Math.round(numero)) <
-    tolleranza
-  ) {
-    return String(Math.round(numero));
-  }
-
-  // Radici quadrate semplici:
-  // 1.4142... → √2
-  // 1.7320... → √3
-  // 2.2360... → √5
-  // ecc.
-  const valoreAssoluto =
-    Math.abs(numero);
-
-  for (
-    let n = 2;
-    n <= 100;
-    n++
-  ) {
-    const radice =
-      Math.sqrt(n);
-
-    if (
-      Math.abs(
-        valoreAssoluto - radice
-      ) < tolleranza
-    ) {
-      return numero < 0
-        ? `-√${n}`
-        : `√${n}`;
-    }
-  }
-
-  // Frazione semplice
-  for (
-    let denominatore = 2;
-    denominatore <= 20;
-    denominatore++
-  ) {
-    const numeratore =
-      Math.round(
-        numero * denominatore
-      );
-
-    if (
-      Math.abs(
-        numero -
-          numeratore /
-            denominatore
-      ) < tolleranza
-    ) {
-      const massimoComunDivisore = (
-        a: number,
-        b: number
-      ): number => {
-        a = Math.abs(a);
-        b = Math.abs(b);
-
-        while (b !== 0) {
-          const resto = a % b;
-          a = b;
-          b = resto;
-        }
-
-        return a;
-      };
-
-      const mcd =
-        massimoComunDivisore(
-          numeratore,
-          denominatore
-        );
-
-      const nRidotto =
-        numeratore / mcd;
-
-      const dRidotto =
-        denominatore / mcd;
-
-      if (dRidotto === 1) {
-        return String(nRidotto);
-      }
-
-      return `${nRidotto}/${dRidotto}`;
-    }
-  }
-
-  // Fallback: numero decimale pulito
-  return numero
-    .toFixed(4)
-    .replace(/0+$/, "")
-    .replace(/\.$/, "");
+// Tutte le sezioni e il grafico condividono la stessa espressione compilata.
+export function normalizzaFunzione(input: string): string {
+  return input.trim().replace(/[−–]/g, "-").replace(/[×·⋅]/g, "*")
+    .replace(/²/g, "^2").replace(/³/g, "^3").replace(/π/g, "pi")
+    .replace(/√/g, "sqrt").replace(/:/g, "/")
+    .replace(/\bln\s*\(/gi, "log(").replace(/\bsen\s*\(/gi, "sin(")
+    .replace(/\btg\s*\(/gi, "tan(").replace(/\bx(\d+)\b/g, "x^$1");
 }
-
-function aggiungiUnico(
-  array: number[],
-  valore: number,
-  tolleranza = 0.01
-) {
-  if (!Number.isFinite(valore)) return;
-
-  if (
-    !array.some(
-      (x) => Math.abs(x - valore) < tolleranza
-    )
-  ) {
-    array.push(valore);
-  }
+const funzioni = new Set(["log", "sqrt", "sin", "cos", "tan", "asin", "acos", "atan", "abs", "exp"]);
+function albero(input: string): MathNode {
+  const node = parse(normalizzaFunzione(input));
+  node.traverse(n => {
+    if (n.type === "SymbolNode" && !["x", "pi", "e", ...funzioni].includes(n.toString()))
+      throw new Error(`Simbolo non riconosciuto: ${n.toString()}`);
+    if (!["OperatorNode", "ParenthesisNode", "FunctionNode", "SymbolNode", "ConstantNode"].includes(n.type))
+      throw new Error("Inserisci una sola espressione matematica.");
+    if (n.type === "FunctionNode" && !funzioni.has((n as unknown as {name:string}).name))
+      throw new Error("Funzione non supportata.");
+  });
+  return node;
 }
-
-/* =========================================================
-   NORMALIZZAZIONE
-   ========================================================= */
-
-export function normalizzaFunzione(
-  input: string
-): string {
-  let risultato = input.trim();
-
-  risultato = risultato.replace(/\s+/g, "");
-
-  risultato = risultato.replace(/−/g, "-");
-  risultato = risultato.replace(/–/g, "-");
-
-  risultato = risultato.replace(/√/g, "sqrt");
-
-  risultato = risultato.replace(/²/g, "^2");
-  risultato = risultato.replace(/³/g, "^3");
-
-  risultato = risultato.replace(/×/g, "*");
-  risultato = risultato.replace(/·/g, "*");
-
-  risultato = risultato.replace(/:/g, "/");
-
-  risultato = risultato.replace(
-    /\bsen\b/gi,
-    "sin"
-  );
-
-  risultato = risultato.replace(
-    /\btg\b/gi,
-    "tan"
-  );
-
-  risultato = risultato.replace(/π/g, "pi");
-
-  /*
-    Permette anche di interpretare input come:
-
-    x2  -> x^2
-    x3  -> x^3
-  */
-  risultato = risultato.replace(
-    /\bx(\d+)\b/g,
-    "x^$1"
-  );
-
-  return risultato;
-}
-
-/* =========================================================
-   VALUTAZIONE
-   ========================================================= */
-
-export function valutaFunzione(
-  funzione: string,
-  x: number
-): number | null {
-  try {
-    const valore = Number(
-      evaluate(
-        normalizzaFunzione(funzione),
-        { x }
-      )
-    );
-
-    if (!Number.isFinite(valore)) {
-      return null;
-    }
-
-    return valore;
-  } catch {
-    return null;
-  }
-}
-
-/* =========================================================
-   DERIVATE
-   ========================================================= */
-
-export function calcolaDerivata(
-  funzione: string
-): string {
-  try {
-    const f = normalizzaFunzione(funzione);
-
-    const risultato = simplify(
-      derivative(f, "x")
-    );
-
-    return risultato.toString();
-  } catch {
-    return "Non determinabile";
-  }
-}
-
-export function calcolaDerivataSeconda(
-  funzione: string
-): string {
-  try {
-    const f = normalizzaFunzione(funzione);
-
-    const prima = derivative(f, "x");
-    const seconda = derivative(prima, "x");
-
-    const risultato = simplify(seconda);
-
-    return risultato.toString();
-  } catch {
-    return "Non determinabile";
-  }
-}
-/* =========================================================
-   PUNTI ESCLUSI DAL DOMINIO
-   ========================================================= */
-
-function trovaEsclusioni(
-  funzione: string
-): number[] {
-  const f = normalizzaFunzione(funzione);
-
-  const esclusi: number[] = [];
-
-  /*
-    Caso classico:
-
-    (x+1)/(x-2)
-    x/(x-3)
-    (x^2+1)/(x^2-4)
-  */
-
-  if (f.includes("/")) {
-    const indice = f.indexOf("/");
-
-    let denominatore =
-      f.substring(indice + 1);
-
-    denominatore =
-      denominatore.replace(
-        /^\(/,
-        ""
-      );
-
-    denominatore =
-      denominatore.replace(
-        /\)$/,
-        ""
-      );
-
-    /*
-      x - a
-    */
-
-    const lineare =
-      denominatore.match(
-        /^x([+-])(\d+(?:\.\d+)?)$/
-      );
-
-    if (lineare) {
-      const numero =
-        Number(lineare[2]);
-
-      const zero =
-        lineare[1] === "-"
-          ? numero
-          : -numero;
-
-      aggiungiUnico(
-        esclusi,
-        zero
-      );
-    }
-
-    /*
-      x + a / x - a
-    */
-
-    const lineare2 =
-      denominatore.match(
-        /^(\d+(?:\.\d+)?)x([+-])(\d+(?:\.\d+)?)$/
-      );
-
-    if (lineare2) {
-      const coefficiente =
-        Number(lineare2[1]);
-
-      const termine =
-        Number(lineare2[3]);
-
-      const zero =
-        lineare2[2] === "-"
-          ? termine / coefficiente
-          : -termine / coefficiente;
-
-      aggiungiUnico(
-        esclusi,
-        zero
-      );
-    }
-
-    /*
-      x^2 - a
-    */
-
-    const quadratico =
-      denominatore.match(
-        /^x\^2-(\d+(?:\.\d+)?)$/
-      );
-
-    if (quadratico) {
-      const valore =
-        Number(quadratico[1]);
-
-      if (valore >= 0) {
-        const r =
-          Math.sqrt(valore);
-
-        aggiungiUnico(
-          esclusi,
-          -r
-        );
-
-        aggiungiUnico(
-          esclusi,
-          r
-        );
-      }
-    }
-
-    /*
-      x^2 + a non ha zeri reali
-    */
-
-    /*
-      Ricerca numerica generica
-    */
-
-    let precedenteX = -100;
-    let precedenteY =
-      valutaFunzione(
-        denominatore,
-        precedenteX
-      );
-
-    for (
-      let x = -99.9;
-      x <= 100;
-      x += 0.1
-    ) {
-      const y =
-        valutaFunzione(
-          denominatore,
-          x
-        );
-
-      if (
-        precedenteY !== null &&
-        y !== null
-      ) {
-        if (
-          Math.abs(y) < 0.000001
-        ) {
-          aggiungiUnico(
-            esclusi,
-            x
-          );
-        }
-
-        if (
-          precedenteY * y < 0
-        ) {
-          let a = precedenteX;
-          let b = x;
-
-          for (
-            let i = 0;
-            i < 50;
-            i++
-          ) {
-            const medio =
-              (a + b) / 2;
-
-            const fa =
-              valutaFunzione(
-                denominatore,
-                a
-              );
-
-            const fm =
-              valutaFunzione(
-                denominatore,
-                medio
-              );
-
-            if (
-              fa === null ||
-              fm === null
-            ) {
-              break;
-            }
-
-            if (
-              Math.abs(fm) <
-              0.0000001
-            ) {
-              aggiungiUnico(
-                esclusi,
-                medio
-              );
-              break;
-            }
-
-            if (
-              fa * fm < 0
-            ) {
-              b = medio;
-            } else {
-              a = medio;
-            }
-          }
-        }
-      }
-
-      precedenteX = x;
-      precedenteY = y;
-    }
-  }
-
-  return esclusi.sort(
-    (a, b) => a - b
-  );
-}
-
-/* =========================================================
-   DOMINIO
-   ========================================================= */
-
-export function calcolaDominio(
-  funzione: string
-): string {
-  const f =
-    normalizzaFunzione(funzione);
-
-  /*
-    Radice semplice
-  */
-
-  if (f === "sqrt(x)") return "[0, +∞)";
-
-  // For log(x ± c), the argument must be strictly positive.
-  const logaritmo = f.match(/^log\(x(?:([+-])(\d+(?:\.\d+)?))?\)$/);
-  if (logaritmo) {
-    const soglia = logaritmo[2]
-      ? (logaritmo[1] === "+" ? -1 : 1) * Number(logaritmo[2])
-      : 0;
-    return `(${numeroPulito(soglia)}, +∞)`;
-  }
-
-  const radice =
-    f.match(/^sqrt\((.*)\)$/);
-
-  if (radice) {
-    const contenuto =
-      radice[1];
-
-    const lineare =
-      contenuto.match(
-        /^x([+-])(\d+(?:\.\d+)?)$/
-      );
-
-    if (lineare) {
-      const numero =
-        Number(lineare[2]);
-
-      if (
-        lineare[1] === "-"
-      ) {
-        return `[${numero}, +∞)`;
-      }
-
-      return `[${-numero}, +∞)`;
-    }
-  }
-
-  const esclusi =
-    trovaEsclusioni(f);
-
-  if (esclusi.length === 0) {
-    return "ℝ";
-  }
-
-  return (
-    "ℝ \\ {" +
-    esclusi
-      .map(numeroPulito)
-      .join(", ") +
-    "}"
-  );
-}
-
-/* =========================================================
-   INTERSEZIONE ASSE Y
-   ========================================================= */
-
-export function calcolaIntersezioneY(
-  funzione: string
-): string {
-  const esclusi =
-    trovaEsclusioni(funzione);
-
-  if (
-    esclusi.some(
-      (x) => Math.abs(x) < 0.000001
-    )
-  ) {
-    return "Non esiste";
-  }
-
-  const valore =
-    valutaFunzione(
-      funzione,
-      0
-    );
-
-  if (valore === null) {
-    return "Non esiste";
-  }
-
-  return `(0, ${numeroPulito(valore)})`;
-}
-
-/* =========================================================
-   INTERSEZIONI ASSE X
-   ========================================================= */
-
-export function calcolaIntersezioniX(
-  funzione: string
-): string {
-  const f =
-    normalizzaFunzione(funzione);
-
-  const esclusi =
-    trovaEsclusioni(f);
-
-  const zeri: number[] = [];
-
-  function valido(x: number) {
-    return !esclusi.some(
-      (e) =>
-        Math.abs(e - x) <
-        0.001
-    );
-  }
-
-  let precedenteX = -100;
-
-  let precedenteY =
-    valutaFunzione(
-      f,
-      precedenteX
-    );
-
-  for (
-    let x = -99.9;
-    x <= 100;
-    x += 0.1
-  ) {
-    const y =
-      valutaFunzione(
-        f,
-        x
-      );
-
-    if (
-      valido(x) &&
-      y !== null
-    ) {
-      if (
-        Math.abs(y) <
-        0.000001
-      ) {
-        aggiungiUnico(
-          zeri,
-          x
-        );
-      }
-    }
-
-    if (
-      precedenteY !== null &&
-      y !== null &&
-      valido(precedenteX) &&
-      valido(x)
-    ) {
-      if (
-        precedenteY * y < 0
-      ) {
-        let a = precedenteX;
-        let b = x;
-
-        for (
-          let i = 0;
-          i < 60;
-          i++
-        ) {
-          const medio =
-            (a + b) / 2;
-
-          const fa =
-            valutaFunzione(
-              f,
-              a
-            );
-
-          const fm =
-            valutaFunzione(
-              f,
-              medio
-            );
-
-          if (
-            fa === null ||
-            fm === null
-          ) {
-            break;
-          }
-
-          if (
-            Math.abs(fm) <
-            0.0000001
-          ) {
-            aggiungiUnico(
-              zeri,
-              medio
-            );
-            break;
-          }
-
-          if (
-            fa * fm < 0
-          ) {
-            b = medio;
-          } else {
-            a = medio;
-          }
-        }
-
-        aggiungiUnico(
-          zeri,
-          (a + b) / 2
-        );
-      }
-    }
-
-    precedenteX = x;
-    precedenteY = y;
-  }
-
-  if (zeri.length === 0) {
-    return "Nessuna intersezione trovata";
-  }
-
-  return zeri
-    .sort((a, b) => a - b)
-    .map(
-      (x) =>
-        `(${numeroPulito(x)}, 0)`
-    )
-    .join(" ; ");
-}
-
-/* =========================================================
-   PUNTI CRITICI
-   ========================================================= */
-
-export function calcolaPuntiCritici(
-  funzione: string
-): string {
-  try {
-    const prima =
-      calcolaDerivata(funzione);
-
-    if (
-      prima ===
-      "Non determinabile"
-    ) {
-      return "Non determinabile";
-    }
-
-    const esclusi =
-      trovaEsclusioni(funzione);
-
-    const punti: number[] = [];
-
-    let precedenteX = -100;
-
-    let precedenteY =
-      valutaFunzione(
-        prima,
-        precedenteX
-      );
-
-    for (
-      let x = -99.9;
-      x <= 100;
-      x += 0.1
-    ) {
-      const y =
-        valutaFunzione(
-          prima,
-          x
-        );
-
-      if (
-        y !== null &&
-        !esclusi.some(
-          (e) =>
-            Math.abs(e - x) <
-            0.01
-        )
-      ) {
-        if (
-          Math.abs(y) <
-          0.000001
-        ) {
-          aggiungiUnico(
-            punti,
-            x
-          );
-        }
-
-        if (
-          precedenteY !== null &&
-          precedenteY * y < 0
-        ) {
-          let a =
-            precedenteX;
-
-          let b = x;
-
-          for (
-            let i = 0;
-            i < 60;
-            i++
-          ) {
-            const medio =
-              (a + b) / 2;
-
-            const fa =
-              valutaFunzione(
-                prima,
-                a
-              );
-
-            const fm =
-              valutaFunzione(
-                prima,
-                medio
-              );
-
-            if (
-              fa === null ||
-              fm === null
-            ) {
-              break;
-            }
-
-            if (
-              fa * fm < 0
-            ) {
-              b = medio;
-            } else {
-              a = medio;
-            }
-          }
-
-          aggiungiUnico(
-            punti,
-            (a + b) / 2
-          );
-        }
-      }
-
-      precedenteX = x;
-      precedenteY = y;
-    }
-
-    if (punti.length === 0) {
-      return "Nessun punto critico trovato";
-    }
-
-    return punti
-      .sort((a, b) => a - b)
-      .map((x) => {
-        const y =
-          valutaFunzione(
-            funzione,
-            x
-          );
-
-        if (y === null) {
-          return `x = ${numeroPulito(x)}`;
-        }
-
-        return `(${numeroPulito(
-          x
-        )}, ${numeroPulito(y)})`;
-      })
-      .join(" ; ");
-  } catch {
-    return "Non determinabile";
-  }
-}
-
-/* =========================================================
-   INTERVALLI DEL DOMINIO
-   ========================================================= */
-
-function creaIntervalli(
-  esclusi: number[]
-): Array<{
-  a: number;
-  b: number;
-}> {
-  const estremi = [
-    -Infinity,
-    ...esclusi,
-    Infinity,
-  ];
-
-  const intervalli: Array<{
-    a: number;
-    b: number;
-  }> = [];
-
-  for (
-    let i = 0;
-    i < estremi.length - 1;
-    i++
-  ) {
-    intervalli.push({
-      a: estremi[i],
-      b: estremi[i + 1],
-    });
-  }
-
-  return intervalli;
-}
-
-function puntoTest(
-  a: number,
-  b: number
-): number {
-  if (a === -Infinity) {
-    return b - 1;
-  }
-
-  if (b === Infinity) {
-    return a + 1;
-  }
-
-  return (a + b) / 2;
-}
-
-/* =========================================================
-   CRESCENZA / DECRESCENZA
-   ========================================================= */
-
-export function calcolaCrescenza(
-  funzione: string
-): string {
-  try {
-    const prima =
-      calcolaDerivata(funzione);
-
-    if (
-      prima === "Non determinabile" ||
-      prima.trim() === ""
-    ) {
-      return "Non determinabile";
-    }
-
-    const esclusi =
-      trovaEsclusioni(funzione);
-
-    const puntiCritici: number[] = [];
-
-    let precedenteX = -100;
-    let precedenteY =
-      valutaFunzione(
-        prima,
-        precedenteX
-      );
-
-    for (
-      let x = -99.9;
-      x <= 100;
-      x += 0.1
-    ) {
-      const y =
-        valutaFunzione(
-          prima,
-          x
-        );
-
-      if (
-        precedenteY !== null &&
-        y !== null
-      ) {
-        if (
-          !esclusi.some(
-            (e) =>
-              Math.abs(e - x) < 0.05
-          )
-        ) {
-          if (
-            Math.abs(y) < 0.000001
-          ) {
-            aggiungiUnico(
-              puntiCritici,
-              x
-            );
-          }
-
-          if (
-            precedenteY * y < 0
-          ) {
-            let a =
-              precedenteX;
-
-            let b = x;
-
-            for (
-              let i = 0;
-              i < 50;
-              i++
-            ) {
-              const medio =
-                (a + b) / 2;
-
-              const fa =
-                valutaFunzione(
-                  prima,
-                  a
-                );
-
-              const fm =
-                valutaFunzione(
-                  prima,
-                  medio
-                );
-
-              if (
-                fa === null ||
-                fm === null
-              ) {
-                break;
-              }
-
-              if (
-                fa * fm < 0
-              ) {
-                b = medio;
-              } else {
-                a = medio;
-              }
-            }
-
-            aggiungiUnico(
-              puntiCritici,
-              (a + b) / 2
-            );
-          }
-        }
-      }
-
-      precedenteX = x;
-      precedenteY = y;
-    }
-
-    /*
-     * Creiamo gli estremi usando SIA
-     * i punti critici SIA i punti
-     * esclusi dal dominio.
-     */
-    const tuttiPunti = [
-      ...puntiCritici,
-      ...esclusi,
-    ];
-
-    const puntiUnici: number[] = [];
-
-    for (const punto of tuttiPunti) {
-      aggiungiUnico(
-        puntiUnici,
-        punto
-      );
-    }
-
-    puntiUnici.sort(
-      (a, b) => a - b
-    );
-
-    const estremi = [
-      -Infinity,
-      ...puntiUnici,
-      Infinity,
-    ];
-
-    const risultati: string[] = [];
-
-    for (
-      let i = 0;
-      i < estremi.length - 1;
-      i++
-    ) {
-      const a =
-        estremi[i];
-
-      const b =
-        estremi[i + 1];
-
-      const test =
-        puntoTest(a, b);
-
-      const valore =
-        valutaFunzione(
-          prima,
-          test
-        );
-
-      if (
-        valore === null
-      ) {
-        continue;
-      }
-
-      const sinistra =
-        a === -Infinity
-          ? "-∞"
-          : numeroPulito(a);
-
-      const destra =
-        b === Infinity
-          ? "+∞"
-          : numeroPulito(b);
-
-      if (valore > 0) {
-        risultati.push(
-          `crescente: (${sinistra}, ${destra})`
-        );
-      } else if (valore < 0) {
-        risultati.push(
-          `decrescente: (${sinistra}, ${destra})`
-        );
-      }
-    }
-
-    if (
-      risultati.length === 0
-    ) {
-      return "Non determinabile";
-    }
-
-    return risultati.join(" | ");
-  } catch {
-    return "Non determinabile";
-  }
-}
-/* =========================================================
-   MASSIMI E MINIMI
-   ========================================================= */
-
-/* =========================================================
-   MASSIMI E MINIMI
-   ========================================================= */
-
-export function calcolaMassimiMinimi(
-  funzione: string
-): string {
-  try {
-    const prima = calcolaDerivata(funzione);
-
-    if (
-      !prima ||
-      prima === "Non determinabile"
-    ) {
-      return "Non determinabile";
-    }
-
-    const esclusi = trovaEsclusioni(funzione);
-
-    const punti: number[] = [];
-
-    function aggiungiPunto(x: number) {
-      if (!Number.isFinite(x)) return;
-
-      if (
-        esclusi.some(
-          (e) => Math.abs(e - x) < 0.01
-        )
-      ) {
-        return;
-      }
-
-      if (
-        !punti.some(
-          (p) => Math.abs(p - x) < 0.01
-        )
-      ) {
-        punti.push(x);
-      }
-    }
-
-    let precedenteX = -100;
-    let precedenteY =
-      valutaFunzione(
-        prima,
-        precedenteX
-      );
-
-    for (
-      let x = -99.9;
-      x <= 100;
-      x += 0.1
-    ) {
-      const y =
-        valutaFunzione(
-          prima,
-          x
-        );
-
-      if (
-        precedenteY !== null &&
-        y !== null
-      ) {
-        if (
-          Math.abs(y) < 0.000001
-        ) {
-          aggiungiPunto(x);
-        }
-
-        if (
-          precedenteY * y < 0
-        ) {
-          let a = precedenteX;
-          let b = x;
-
-          for (
-            let i = 0;
-            i < 60;
-            i++
-          ) {
-            const medio =
-              (a + b) / 2;
-
-            const fa =
-              valutaFunzione(
-                prima,
-                a
-              );
-
-            const fm =
-              valutaFunzione(
-                prima,
-                medio
-              );
-
-            if (
-              fa === null ||
-              fm === null
-            ) {
-              break;
-            }
-
-            if (
-              Math.abs(fm) <
-              0.0000001
-            ) {
-              a = medio;
-              b = medio;
-              break;
-            }
-
-            if (
-              fa * fm < 0
-            ) {
-              b = medio;
-            } else {
-              a = medio;
-            }
-          }
-
-          aggiungiPunto(
-            (a + b) / 2
-          );
-        }
-      }
-
-      precedenteX = x;
-      precedenteY = y;
-    }
-
-    punti.sort(
-      (a, b) => a - b
-    );
-
-    if (punti.length === 0) {
-      return "Nessun massimo o minimo relativo trovato";
-    }
-
-    const risultati: string[] = [];
-
-    for (const x of punti) {
-      const sinistra =
-        valutaFunzione(
-          prima,
-          x - 0.001
-        );
-
-      const destra =
-        valutaFunzione(
-          prima,
-          x + 0.001
-        );
-
-      const y =
-        valutaFunzione(
-          funzione,
-          x
-        );
-
-      if (
-        sinistra === null ||
-        destra === null ||
-        y === null
-      ) {
-        continue;
-      }
-
-      if (
-        sinistra > 0 &&
-        destra < 0
-      ) {
-        risultati.push(
-          `Massimo relativo: (${numeroPulito(x)}, ${numeroPulito(y)})`
-        );
-      } else if (
-        sinistra < 0 &&
-        destra > 0
-      ) {
-        risultati.push(
-          `Minimo relativo: (${numeroPulito(x)}, ${numeroPulito(y)})`
-        );
-      }
-    }
-
-    if (risultati.length === 0) {
-      return "Nessun massimo o minimo relativo trovato";
-    }
-
-    return risultati.join(" | ");
-  } catch {
-    return "Non determinabile";
-  }
-}
-
-/*
-  Piccole funzioni di supporto per mantenere
-  calcolaMassimiMinimi leggibile.
-*/
-
-function pontosSemDuplicatas(
-  punti: number[]
-): number[] {
-  return [
-    ...new Set(
-      punti.map(
-        (x) =>
-          Number(
-            x.toFixed(6)
-          )
-      )
-    ),
-  ];
-}
-
-function excluidosSafe(
-  esclusi: number[]
-): number[] {
-  return esclusi;
-}
-
-function pontosValidos(
-  punti: number[],
-  esclusi: number[]
-): number[] {
-  return punti.filter(
-    (x) =>
-      !esclusi.some(
-        (e) =>
-          Math.abs(e - x) <
-          0.01
-      )
-  );
-}
-
-function valutaFunzioneNumero(
-  funzione: string,
-  x: number
-): number | null {
-  return valutaFunzione(
-    funzione,
-    x
-  );
-}
-
-function valutaFunzioneNumeroNormalizzata(
-  funzione: string,
-  x: number
-): number | null {
-  return valutaFunzione(
-    funzione,
-    x
-  );
-}
-
-function funzioneNormalizzata(
-  funzione: string
-): string {
-  return normalizzaFunzione(
-    funzione
-  );
-}
-
-/* =========================================================
-   CONCAVITÀ
-   ========================================================= */
-
-export function calcolaConcavita(
-  funzione: string
-): string {
-  try {
-    const seconda =
-      calcolaDerivataSeconda(
-        funzione
-      );
-
-    if (
-      seconda === "Non determinabile" ||
-      seconda.trim() === ""
-    ) {
-      return "Non determinabile";
-    }
-
-    const esclusi =
-      trovaEsclusioni(funzione);
-
-      /*
- * Verifica se la derivata seconda
- * è numericamente uguale a zero.
- */
-const puntiControllo = [
-  -10, -5, -1, 0, 1, 3, 5, 10
-];
-
-const valoriControllo = puntiControllo
-  .filter(
-    (x) =>
-      !esclusi.some(
-        (e) => Math.abs(e - x) < 0.001
-      )
-  )
-  .map(
-    (x) => valutaFunzione(seconda, x)
-  )
-  .filter(
-    (v): v is number => v !== null
-  );
-
-if (
-  valoriControllo.length > 0 &&
-  valoriControllo.every(
-    (v) => Math.abs(v) < 1e-9
-  )
-) {
-  return "Né concava né convessa; nessun punto di flesso";
-}
-
-    const punti: number[] = [];
-
-    let precedenteX = -100;
-    let precedenteY =
-      valutaFunzione(
-        seconda,
-        precedenteX
-      );
-
-    for (
-      let x = -99.9;
-      x <= 100;
-      x += 0.1
-    ) {
-      const y =
-        valutaFunzione(
-          seconda,
-          x
-        );
-
-      if (
-        precedenteY !== null &&
-        y !== null
-      ) {
-        const vicinoEscluso =
-          esclusi.some(
-            (e) =>
-              Math.abs(e - x) < 0.05
-          );
-
-        if (!vicinoEscluso) {
-          /*
-           * Individua gli zeri della derivata seconda.
-           */
-          if (
-            Math.abs(y) < 0.000001
-          ) {
-            aggiungiUnico(
-              punti,
-              x
-            );
-          }
-
-          /*
-           * Individua gli zeri anche quando
-           * la derivata seconda attraversa lo zero
-           * tra due campioni.
-           */
-          if (
-            precedenteY * y < 0
-          ) {
-            let a =
-              precedenteX;
-
-            let b = x;
-
-            for (
-              let i = 0;
-              i < 50;
-              i++
-            ) {
-              const medio =
-                (a + b) / 2;
-
-              const fa =
-                valutaFunzione(
-                  seconda,
-                  a
-                );
-
-              const fm =
-                valutaFunzione(
-                  seconda,
-                  medio
-                );
-
-              if (
-                fa === null ||
-                fm === null
-              ) {
-                break;
-              }
-
-              if (
-                fa * fm < 0
-              ) {
-                b = medio;
-              } else {
-                a = medio;
-              }
-            }
-
-            aggiungiUnico(
-              punti,
-              (a + b) / 2
-            );
-          }
-        }
-      }
-
-      precedenteX = x;
-      precedenteY = y;
-    }
-
-    /*
-     * Uniamo gli zeri della derivata seconda
-     * con le esclusioni del dominio.
-     */
-    const tuttiPunti = [
-      ...punti,
-      ...esclusi,
-    ];
-
-    const puntiUnici: number[] = [];
-
-    for (const punto of tuttiPunti) {
-      aggiungiUnico(
-        puntiUnici,
-        punto
-      );
-    }
-
-    puntiUnici.sort(
-      (a, b) => a - b
-    );
-
-    const estremi = [
-      -Infinity,
-      ...puntiUnici,
-      Infinity,
-    ];
-
-    const risultati: string[] = [];
-
-    for (
-      let i = 0;
-      i < estremi.length - 1;
-      i++
-    ) {
-      const a =
-        estremi[i];
-
-      const b =
-        estremi[i + 1];
-
-      const test =
-        puntoTest(a, b);
-
-      const valore =
-        valutaFunzione(
-          seconda,
-          test
-        );
-
-      if (
-        valore === null
-      ) {
-        continue;
-      }
-
-      const sinistra =
-        a === -Infinity
-          ? "-∞"
-          : numeroPulito(a);
-
-      const destra =
-        b === Infinity
-          ? "+∞"
-          : numeroPulito(b);
-
-      if (valore > 0) {
-        risultati.push(
-          `convessa: (${sinistra}, ${destra})`
-        );
-      } else if (valore < 0) {
-        risultati.push(
-          `concava: (${sinistra}, ${destra})`
-        );
-      }
-    }
-
-    if (
-      risultati.length === 0
-    ) {
-      return "Concavità da determinare";
-    }
-
-    return risultati.join(" | ");
-  } catch {
-    return "Non determinabile";
-  }
-}
-/* =========================================================
-   FLESSI
-   ========================================================= */
-
-export function calcolaFlessi(
-  funzione: string
-): string {
-  try {
-    const seconda =
-      calcolaDerivataSeconda(
-        funzione
-      );
-
-    const esclusi =
-      trovaEsclusioni(funzione);
-      /*
- * Se la derivata seconda è numericamente
- * uguale a zero, non ci sono punti di flesso.
- */
-const puntiControlloFlessi = [
-  -10, -5, -1, 0, 1, 3, 5, 10
-];
-
-const valoriControlloFlessi = puntiControlloFlessi
-  .filter(
-    (x) =>
-      !esclusi.some(
-        (e) => Math.abs(e - x) < 0.001
-      )
-  )
-  .map(
-    (x) => valutaFunzione(seconda, x)
-  )
-  .filter(
-    (v): v is number => v !== null
-  );
-
-if (
-  valoriControlloFlessi.length > 0 &&
-  valoriControlloFlessi.every(
-    (v) => Math.abs(v) < 1e-9
-  )
-) {
-  return "Nessun flesso trovato";
-}
-
-
-    const zeri: number[] = [];
-
-    let precedenteX = -100;
-
-    let precedente =
-      valutaFunzione(
-        seconda,
-        precedenteX
-      );
-
-    for (
-      let x = -99.9;
-      x <= 100;
-      x += 0.1
-    ) {
-      const attuale =
-        valutaFunzione(
-          seconda,
-          x
-        );
-
-      if (
-        precedente !== null &&
-        attuale !== null &&
-        precedente * attuale < 0
-      ) {
-        let a =
-          precedenteX;
-
-        let b = x;
-
-        for (
-          let i = 0;
-          i < 60;
-          i++
-        ) {
-          const medio =
-            (a + b) / 2;
-
-          const fa =
-            valutaFunzione(
-              seconda,
-              a
-            );
-
-          const fm =
-            valutaFunzione(
-              seconda,
-              medio
-            );
-
-          if (
-            fa === null ||
-            fm === null
-          ) {
-            break;
-          }
-
-          if (
-            fa * fm < 0
-          ) {
-            b = medio;
-          } else {
-            a = medio;
-          }
-        }
-
-        const zero =
-          (a + b) / 2;
-
-        /*
-          Un punto escluso dal dominio
-          NON può essere un flesso.
-        */
-
-        if (
-          !esclusi.some(
-            (e) =>
-              Math.abs(e - zero) <
-              0.01
-          )
-        ) {
-          /*
-            Verifichiamo realmente il cambio
-            di concavità.
-          */
-
-          const sinistra =
-            valutaFunzione(
-              seconda,
-              zero - 0.01
-            );
-
-          const destra =
-            valutaFunzione(
-              seconda,
-              zero + 0.01
-            );
-
-          if (
-            sinistra !== null &&
-            destra !== null &&
-            sinistra * destra < 0
-          ) {
-            aggiungiUnico(
-              zeri,
-              zero
-            );
-          }
-        }
-      }
-
-      precedenteX = x;
-      precedente = attuale;
-    }
-
-    if (zeri.length === 0) {
-      return "Nessun flesso trovato";
-    }
-
-    return zeri
-      .sort((a, b) => a - b)
-      .map((x) => {
-        const y =
-          valutaFunzione(
-            funzione,
-            x
-          );
-
-        if (y === null) {
-          return `x = ${numeroPulito(x)}`;
-        }
-
-        return `(${numeroPulito(
-          x
-        )}, ${numeroPulito(y)})`;
-      })
-      .join(" ; ");
-  } catch {
-    return "Non determinabile";
-  }
-}
-
-/* =========================================================
-   LIMITI
-   ========================================================= */
-
-function limiteNumerico(
-  funzione: string,
-  direzione:
-    | "positivo"
-    | "negativo"
-): number | null {
-  const valori = [
-    100,
-    1000,
-    10000,
-    100000,
-  ];
-
-  let ultimo:
-    number | null = null;
-
-  for (const valore of valori) {
-    const x =
-      direzione === "positivo"
-        ? valore
-        : -valore;
-
-    const risultato =
-      valutaFunzione(
-        funzione,
-        x
-      );
-
-    if (
-      risultato !== null &&
-      Number.isFinite(
-        risultato
-      )
-    ) {
-      ultimo = risultato;
-    }
-  }
-
-  return ultimo;
-}
-
-/* =========================================================
-   ASINTOTI VERTICALI
-   ========================================================= */
-
-export function calcolaAsintotiVerticali(
-  funzione: string
-): string {
-  const esclusi =
-    trovaEsclusioni(funzione);
-
-  if (esclusi.length === 0) {
-    return "Nessun asintoto verticale trovato";
-  }
-
-  const risultati: string[] = [];
-
-  for (const x of esclusi) {
-    const sinistra =
-      valutaFunzione(
-        funzione,
-        x - 0.000001
-      );
-
-    const destra =
-      valutaFunzione(
-        funzione,
-        x + 0.000001
-      );
-
-    /*
-      Per un asintoto verticale almeno
-      uno dei due lati deve tendere a infinito.
-
-      Con le funzioni razionali, vicino
-      all'esclusione mathjs può restituire
-      numeri molto grandi ma finiti.
-    */
-
-    const sinistraGrande =
-      sinistra !== null &&
-      Math.abs(sinistra) > 100000;
-
-    const destraGrande =
-      destra !== null &&
-      Math.abs(destra) > 100000;
-
-    if (
-      sinistra === null ||
-      destra === null ||
-      sinistraGrande ||
-      destraGrande
-    ) {
-      risultati.push(
-        `x = ${numeroPulito(x)}`
-      );
-    }
-  }
-
-  if (risultati.length === 0) {
-    return "Nessun asintoto verticale trovato";
-  }
-
-  return risultati.join(" ; ");
-}
-
-/* =========================================================
-   ASINTOTI ORIZZONTALI
-   ========================================================= */
-
-export function calcolaAsintotiOrizzontali(
-  funzione: string
-): string {
-  try {
-    function limiteDirezione(
-      direzione: "positivo" | "negativo"
-    ): number | null {
-      const x1 =
-        direzione === "positivo"
-          ? 10000
-          : -10000;
-
-      const x2 =
-        direzione === "positivo"
-          ? 100000
-          : -100000;
-
-      const y1 =
-        valutaFunzione(
-          funzione,
-          x1
-        );
-
-      const y2 =
-        valutaFunzione(
-          funzione,
-          x2
-        );
-
-      if (
-        y1 === null ||
-        y2 === null ||
-        !Number.isFinite(y1) ||
-        !Number.isFinite(y2)
-      ) {
-        return null;
-      }
-
-      // Se i valori crescono senza limite,
-      // non esiste un asintoto orizzontale.
-      if (
-        Math.abs(y2) > 1e8
-      ) {
-        return null;
-      }
-
-      // Controlliamo che il valore si stia
-      // stabilizzando verso un numero finito.
-      const differenza =
-        Math.abs(y2 - y1);
-
-      const tolleranza =
-        Math.max(
-          0.001,
-          Math.abs(y2) * 0.0001
-        );
-
-      if (
-        differenza > tolleranza
-      ) {
-        return null;
-      }
-
-      return y2;
-    }
-
-    const risultati: string[] = [];
-
-    const positivo =
-      limiteDirezione(
-        "positivo"
-      );
-
-    const negativo =
-      limiteDirezione(
-        "negativo"
-      );
-
-    if (positivo !== null) {
-      risultati.push(
-        `y = ${numeroPulito(
-          positivo
-        )} per x → +∞`
-      );
-    }
-
-    if (negativo !== null) {
-      risultati.push(
-        `y = ${numeroPulito(
-          negativo
-        )} per x → -∞`
-      );
-    }
-
-    if (
-      risultati.length === 0
-    ) {
-      return "Nessun asintoto orizzontale trovato";
-    }
-
-    return risultati.join(" | ");
-  } catch {
-    return "Nessun asintoto orizzontale trovato";
-  }
-}
-/* =========================================================
-   ASINTOTI OBLIQUI
-   ========================================================= */
-
-export function calcolaAsintotiObliqui(
-  funzione: string
-): string {
-  try {
-    function pulitoAsintoto(
-      valore: number
-    ): string {
-      if (
-        Math.abs(
-          valore - Math.round(valore)
-        ) < 0.001
-      ) {
-        return String(
-          Math.round(valore)
-        );
-      }
-
-      return numeroPulito(valore);
-    }
-
-    function calcola(
-      direzione:
-        | "positivo"
-        | "negativo"
-    ): string | null {
-
-      const x1 =
-        direzione === "positivo"
-          ? 100000
-          : -100000;
-
-      const x2 =
-        direzione === "positivo"
-          ? 50000
-          : -50000;
-
-      const y1 =
-        valutaFunzione(
-          funzione,
-          x1
-        );
-
-      const y2 =
-        valutaFunzione(
-          funzione,
-          x2
-        );
-
-      if (
-        y1 === null ||
-        y2 === null
-      ) {
-        return null;
-      }
-
-      if (
-        !Number.isFinite(y1) ||
-        !Number.isFinite(y2)
-      ) {
-        return null;
-      }
-
-      /*
-       * Calcolo della pendenza:
-       *
-       * m = (f(x1) - f(x2)) / (x1 - x2)
-       */
-      const m =
-        (y1 - y2) /
-        (x1 - x2);
-
-      if (
-        !Number.isFinite(m)
-      ) {
-        return null;
-      }
-
-      /*
-       * Un asintoto obliquo deve avere
-       * una pendenza diversa da zero.
-       */
-      if (
-        Math.abs(m) < 0.0001 ||
-        Math.abs(m) > 1000
-      ) {
-        return null;
-      }
-
-      /*
-       * Calcolo dell'intercetta:
-       *
-       * q = f(x) - mx
-       */
-      const q =
-        y1 - m * x1;
-
-      const q2 =
-        y2 - m * x2;
-
-      if (
-        !Number.isFinite(q) ||
-        !Number.isFinite(q2)
-      ) {
-        return null;
-      }
-
-      /*
-       * Controllo che q sia stabile.
-       */
-      if (
-        Math.abs(q - q2) > 0.01
-      ) {
-        return null;
-      }
-
-      const mPulito =
-        pulitoAsintoto(m);
-
-      const qPulito =
-        pulitoAsintoto(
-          Math.abs(q) < 0.001
-            ? 0
-            : q
-        );
-
-      const segno =
-        q >= 0
-          ? "+"
-          : "-";
-
-      return (
-        `y = ${mPulito}x ${segno} ${qPulito} per x → ${
-          direzione === "positivo"
-            ? "+∞"
-            : "-∞"
-        }`
-      );
-    }
-
-    const risultati: string[] = [];
-
-    const positivo =
-      calcola("positivo");
-
-    const negativo =
-      calcola("negativo");
-
-    if (positivo) {
-      risultati.push(
-        positivo
-      );
-    }
-
-    if (negativo) {
-      risultati.push(
-        negativo
-      );
-    }
-
-     if (
-      risultati.length === 0
-    ) {
-      return "Nessun asintoto obliquo trovato";
-    }
-
-    return risultati.join(" | ");
-
-  } catch {
-    return "Nessun asintoto obliquo trovato";
-  }
-}
-/* =========================================================
-   SEGNO
-   ========================================================= */
-
-export function calcolaSegno(
-  funzione: string
-): string {
-  try {
-    const f =
-      normalizzaFunzione(funzione);
-
-    const esclusi =
-      trovaEsclusioni(f);
-
-    const zeri: number[] = [];
-
-    let precedenteX = -100;
-
-    let precedenteY =
-      valutaFunzione(
-        f,
-        precedenteX
-      );
-
-    for (
-      let x = -99.9;
-      x <= 100;
-      x += 0.1
-    ) {
-      const y =
-        valutaFunzione(
-          f,
-          x
-        );
-
-      if (
-        y !== null &&
-        !esclusi.some(
-          (e) =>
-            Math.abs(e - x) <
-            0.01
-        )
-      ) {
-        if (
-          Math.abs(y) <
-          0.000001
-        ) {
-          aggiungiUnico(
-            zeri,
-            x
-          );
-        }
-      }
-
-      if (
-        precedenteY !== null &&
-        y !== null &&
-        !esclusi.some(
-          (e) =>
-            e > precedenteX &&
-            e < x
-        )
-      ) {
-        if (
-          precedenteY * y < 0
-        ) {
-          let a =
-            precedenteX;
-
-          let b = x;
-
-          for (
-            let i = 0;
-            i < 60;
-            i++
-          ) {
-            const medio =
-              (a + b) / 2;
-
-            const fa =
-              valutaFunzione(
-                f,
-                a
-              );
-
-            const fm =
-              valutaFunzione(
-                f,
-                medio
-              );
-
-            if (
-              fa === null ||
-              fm === null
-            ) {
-              break;
-            }
-
-            if (
-              fa * fm < 0
-            ) {
-              b = medio;
-            } else {
-              a = medio;
-            }
-          }
-
-          aggiungiUnico(
-            zeri,
-            (a + b) / 2
-          );
-        }
-      }
-
-      precedenteX = x;
-      precedenteY = y;
-    }
-
-    zeri.sort(
-      (a, b) => a - b
-    );
-
-    const punti =
-      [
-        -Infinity,
-        ...zeri,
-        ...esclusi,
-        Infinity,
-      ].sort(
-        (a, b) => a - b
-      );
-
-    const unici: number[] = [];
-
-    for (const p of punti) {
-      if (
-        !unici.some(
-          (x) =>
-            Number.isFinite(x) &&
-            Number.isFinite(p) &&
-            Math.abs(x - p) <
-              0.01
-        )
-      ) {
-        unici.push(p);
-      }
-    }
-
-    const intervalli: string[] = [];
-
-    for (
-      let i = 0;
-      i < unici.length - 1;
-      i++
-    ) {
-      const a = unici[i];
-      const b = unici[i + 1];
-
-      const test =
-        puntoTest(a, b);
-
-      const valore =
-        valutaFunzione(
-          f,
-          test
-        );
-
-      if (valore === null) {
-        continue;
-      }
-
-      const sinistra =
-        a === -Infinity
-          ? "-∞"
-          : numeroPulito(a);
-
-      const destra =
-        b === Infinity
-          ? "+∞"
-          : numeroPulito(b);
-
-      intervalli.push(
-        `(${sinistra}, ${destra}) → ${
-          valore > 0
-            ? "+"
-            : "-"
-        }`
-      );
-    }
-
-    const zeriTesto =
-      zeri
-        .map(
-          (x) =>
-            `f(${numeroPulito(
-              x
-            )}) = 0`
-        )
-        .join(" | ");
-
-    const risultato =
-      intervalli.join(" | ");
-
-    if (zeriTesto) {
-      return risultato
-        ? `${risultato} | ${zeriTesto}`
-        : zeriTesto;
-    }
-
-    return risultato ||
-      "Segno non determinabile";
-  } catch {
-    return "Segno non determinabile";
-  }
-}
-
-/* =========================================================
-   STUDIO COMPLETO
-   ========================================================= */
-
-export function calcolaStudioCompleto(
-  funzioneInput: string
-) {
-  const funzione =
-    normalizzaFunzione(
-      funzioneInput
-    );
-
-  return {
-    funzione:
-      funzioneInput,
-
-    dominio:
-      calcolaDominio(
-        funzione
-      ),
-
-    intersezioniX:
-      calcolaIntersezioniX(
-        funzione
-      ),
-
-    intersezioneY:
-      calcolaIntersezioneY(
-        funzione
-      ),
-
-    segno:
-      calcolaSegno(
-        funzione
-      ),
-
-    derivataPrima:
-      calcolaDerivata(
-        funzione
-      ),
-
-    puntiCritici:
-      calcolaPuntiCritici(
-        funzione
-      ),
-
-    crescenza:
-      calcolaCrescenza(
-        funzione
-      ),
-
-    estremi:
-      calcolaMassimiMinimi(
-        funzione
-      ),
-
-    derivataSeconda:
-      calcolaDerivataSeconda(
-        funzione
-      ),
-
-    concavita:
-      calcolaConcavita(
-        funzione
-      ),
-
-    flessi:
-      calcolaFlessi(
-        funzione
-      ),
-
-    asintotiVerticali:
-      calcolaAsintotiVerticali(
-        funzione
-      ),
-
-    asintotiOrizzontali:
-      calcolaAsintotiOrizzontali(
-        funzione
-      ),
-
-    asintotiObliqui:
-      calcolaAsintotiObliqui(
-        funzione
-      ),
+type Valutatore = (x: number) => number | null;
+function compila(node: MathNode): Valutatore {
+  const code = node.compile();
+  return x => {
+    try {
+      const y: unknown = code.evaluate({ x });
+      return typeof y === "number" && Number.isFinite(y) ? y : null;
+    } catch { return null; }
   };
+}
+const cache = new Map<string, Valutatore>();
+export function valutaFunzione(input: string, x: number): number | null {
+  try {
+    const key = normalizzaFunzione(input);
+    let fn = cache.get(key);
+    if (!fn) {
+      fn = compila(albero(key));
+      if (cache.size >= 64) cache.clear();
+      cache.set(key, fn);
+    }
+    return fn(x);
+  } catch { return null; }
+}
+function testo(x: number): string {
+  if (!Number.isFinite(x)) return x < 0 ? "-∞" : "+∞";
+  if (Math.abs(x - Math.round(x)) < 1e-8) return String(Math.round(x));
+  for (let n = 2; n <= 100; n++) if (Math.abs(Math.abs(x) - Math.sqrt(n)) < 1e-8)
+    return `${x < 0 ? "-" : ""}√${n}`;
+  return x.toFixed(6).replace(/0+$/, "").replace(/\.$/, "");
+}
+function unici(xs: number[]): number[] {
+  return xs.filter(Number.isFinite).sort((a,b)=>a-b).filter((x,i,a)=>!i || Math.abs(x-a[i-1])>1e-7);
+}
+type Nodo = MathNode & { args?: MathNode[]; content?: MathNode; op?: string; name?: string; value?: number };
+// Coefficienti in ordine crescente; i polinomi hanno radici isolate usando
+// anche le radici della derivata, così si trovano gli zeri di molteplicità pari.
+function polinomio(node: MathNode): number[] | null {
+  const n = node as Nodo;
+  if (n.content) return polinomio(n.content);
+  if (n.type === "ConstantNode") return [Number(n.value)];
+  if (n.type === "SymbolNode") return n.name === "x" ? [0,1] : null;
+  if (n.type !== "OperatorNode" || !n.args) return null;
+  const a = polinomio(n.args[0]);
+  if (!a) return null;
+  if (n.args.length === 1) return n.op === "-" ? a.map(x=>-x) : a;
+  const b = polinomio(n.args[1]);
+  if (!b) return null;
+  if (n.op === "+" || n.op === "-") return Array.from({length:Math.max(a.length,b.length)},(_,i)=>(a[i]||0)+(n.op==="+"?1:-1)*(b[i]||0));
+  if (n.op === "*") {
+    const c = Array(a.length+b.length-1).fill(0) as number[];
+    a.forEach((v,i)=>b.forEach((w,j)=>c[i+j]+=v*w)); return c;
+  }
+  if (n.op === "/" && b.length === 1 && b[0] !== 0) return a.map(x=>x/b[0]);
+  if (n.op === "^" && b.length === 1 && Number.isInteger(b[0]) && b[0]>=0 && b[0]<=16) {
+    let c = [1];
+    for (let k=0;k<b[0];k++) {
+      const d = Array(c.length+a.length-1).fill(0) as number[];
+      c.forEach((v,i)=>a.forEach((w,j)=>d[i+j]+=v*w)); c=d;
+    } return c;
+  }
+  return null;
+}
+function bisezione(fn: Valutatore, a: number, b: number): number | null {
+  let fa=fn(a); const fb=fn(b);
+  if (fa===null || fb===null || fa*fb>=0) return null;
+  for (let i=0;i<80;i++) {
+    const m=(a+b)/2, fm=fn(m);
+    if (fm===null) return null;
+    if (fm===0) return m;
+    if (fa*fm<0) b=m; else { a=m; fa=fm; }
+  }
+  const x=(a+b)/2, y=fn(x);
+  // Una variazione di segno attraverso un polo non è uno zero.
+  return y!==null && Math.abs(y)<1e-7 ? x : null;
+}
+function radiciPolinomio(coeff: number[]): number[] {
+  const c=[...coeff]; while(c.length>1 && c[c.length-1]===0) c.pop();
+  if(c.length<2) return [];
+  if(c.length===2) return [-c[0]/c[1]];
+  const bound=1+Math.max(...c.slice(0,-1).map(x=>Math.abs(x/c[c.length-1])));
+  const fn: Valutatore=x=>c.reduceRight((s,v)=>s*x+v,0);
+  const critical=radiciPolinomio(c.slice(1).map((v,i)=>v*(i+1))).filter(x=>Math.abs(x)<bound);
+  const xs=[-bound,...critical,bound], roots=critical.filter(x=>Math.abs(fn(x)!)<1e-9);
+  for(let i=0;i<xs.length-1;i++) { const r=bisezione(fn,xs[i],xs[i+1]); if(r!==null) roots.push(r); }
+  return unici(roots);
+}
+function radici(node: MathNode, valida: Valutatore = ()=>1): number[] {
+  const p=polinomio(node), fn=compila(node);
+  if(p) return radiciPolinomio(p).filter(x=>valida(x)!==null);
+  const roots:number[]=[];
+  // Risoluzione numerica dichiaratamente limitata a [-100,100].
+  let a=-100, fa=valida(a)!==null ? fn(a) : null;
+  for(let i=1;i<=20000;i++) {
+    const b=-100+i/100, fb=valida(b)!==null ? fn(b) : null;
+    if(fb===0) roots.push(b);
+    if(fa!==null && fb!==null && fa*fb<0) {
+      const r=bisezione(x=>valida(x)===null ? null : fn(x),a,b);
+      if(r!==null) roots.push(r);
+    }
+    a=b; fa=fb;
+  }
+  // Zeri tangenti in fattori polinomiali (es. (x-0.123)^2 * exp(x)).
+  node.traverse(n=> { const q=polinomio(n); if(q && q.length>1) {
+    for(const x of radiciPolinomio(q)) if(valida(x)!==null && Math.abs(fn(x)??Infinity)<1e-9) roots.push(x);
+  }});
+  return unici(roots);
+}
+type Condizione = { fn: Valutatore; tipo: "positivo" | "nonnegativo" | "nonzero" };
+function condizioni(node: MathNode): { condizioni: Condizione[]; confini: number[]; completo: boolean } {
+  const cs:Condizione[]=[], confini:number[]=[]; let completo=true;
+  function add(n:MathNode,tipo:Condizione["tipo"]) {
+    const v=n as Nodo;
+    if(v.content) { add(v.content,tipo); return; }
+    if(v.type==="FunctionNode" && v.name==="sqrt" && v.args) {
+      add(v.args[0],tipo==="nonnegativo"?"nonnegativo":"positivo"); return;
+    }
+    if(v.type==="FunctionNode" && v.name==="log" && v.args && tipo==="nonzero") {
+      add(parse(`(${v.args[0].toString()})-1`),"nonzero"); return;
+    }
+    cs.push({fn:compila(n),tipo}); confini.push(...radici(n));
+    if(!polinomio(n)) completo=false;
+  }
+  node.traverse(raw=> {
+    const n=raw as Nodo, args=n.args||[];
+    if(n.op==="/") add(args[1],"nonzero");
+    if(n.op==="^" && args.length===2) {
+      const exp=compila(args[1])(0);
+      if(args[1].filter(n=>n.type==="SymbolNode" && n.toString()==="x").length) completo=false;
+      else if(exp!==null && !Number.isInteger(exp)) add(args[0],exp<0?"positivo":"nonnegativo");
+      else if(exp!==null && exp<0) add(args[0],"nonzero");
+    }
+    if(n.type==="FunctionNode") {
+      if(n.name==="log") {
+        add(args[0],"positivo");
+        if(args[1]) { add(args[1],"positivo"); add(parse(`(${args[1].toString()})-1`),"nonzero"); }
+      }
+      if(n.name==="sqrt") add(args[0],"nonnegativo");
+      if(n.name==="asin" || n.name==="acos") add(parse(`1-(${args[0].toString()})^2`),"nonnegativo");
+      if(n.name==="tan") { add(parse(`cos(${args[0].toString()})`),"nonzero"); completo=false; }
+    }
+  });
+  return {condizioni:cs,confini:unici(confini),completo};
+}
+function campione(a:number,b:number):number {
+  if(a===-Infinity && b===Infinity) return 0;
+  if(a===-Infinity) return b-Math.max(1,Math.abs(b));
+  if(b===Infinity) return a+Math.max(1,Math.abs(a));
+  return (a+b)/2;
+}
+function intervallo(a:number,b:number):string {return `(${testo(a)}, ${testo(b)})`;}
+function modello(input:string) {
+  const node=albero(input), raw=compila(node), d=condizioni(node);
+  const valida:Valutatore=x=> {
+    for(const c of d.condizioni) {
+      const y=c.fn(x);
+      if(y===null || (c.tipo==="positivo"?y<=0:c.tipo==="nonnegativo"?y<0:y===0)) return null;
+    }
+    return raw(x);
+  };
+  const bounds=[-Infinity,...d.confini,Infinity];
+  const parti=bounds.slice(0,-1).map((a,i)=>({a,b:bounds[i+1]})).filter(v=>valida(campione(v.a,v.b))!==null);
+  return {node,fn:valida,...d,parti};
+}
+export function calcolaDominio(input:string):string {
+  const m=modello(input);
+  if(!m.completo) return "Dominio non risolto globalmente: condizioni di esistenza verificate numericamente in [-100, 100].";
+  if(!m.condizioni.length) return "ℝ";
+  const pezzi=m.parti.map(({a,b})=>`${Number.isFinite(a)&&m.fn(a)!==null?"[":"("}${testo(a)}, ${testo(b)}${Number.isFinite(b)&&m.fn(b)!==null?"]":")"}`);
+  for(const x of m.confini) if(m.fn(x)!==null && !m.parti.some(p=>p.a===x || p.b===x)) pezzi.push(`{${testo(x)}}`);
+  return pezzi.join(" ∪ ") || "∅";
+}
+function derivataNode(input:string,ordine:number):MathNode {
+  let n=albero(input); for(let i=0;i<ordine;i++) n=derivative(n,"x");
+  try { return simplify(n); } catch { return n; }
+}
+export function calcolaDerivata(input:string):string {try{return derivataNode(input,1).toString();}catch{return "Non determinabile";}}
+export function calcolaDerivataSeconda(input:string):string {try{return derivataNode(input,2).toString();}catch{return "Non determinabile";}}
+function punti(input:string,ordine:number):number[] { const m=modello(input); return radici(ordine?derivataNode(input,ordine):m.node,m.fn); }
+function coordinate(input:string,xs:number[]):string {const fn=modello(input).fn;return xs.map(x=>`(${testo(x)}, ${testo(fn(x)!)})`).join(" ; ");}
+export function calcolaIntersezioniX(input:string):string {return coordinate(input,punti(input,0)) || "Nessuna intersezione trovata (ricerca numerica in [-100, 100])";}
+export function calcolaIntersezioneY(input:string):string {const y=modello(input).fn(0);return y===null?"Non esiste":`(0, ${testo(y)})`;}
+export function calcolaPuntiCritici(input:string):string {try{return coordinate(input,punti(input,1))||"Nessun punto stazionario trovato in [-100, 100]";}catch{return "Non determinabile";}}
+function segni(input:string,ordine:number,positivo:string,negativo:string):string {
+  const m=modello(input), n=ordine?derivataNode(input,ordine):m.node, fn=compila(n);
+  const roots=radici(n,m.fn), bounds=[-Infinity,...unici([...roots,...m.confini]),Infinity];
+  const risultati:string[]=[];
+  for(let i=0;i<bounds.length-1;i++) {
+    const a=bounds[i],b=bounds[i+1], x=campione(a,b);
+    if(m.fn(x)===null) continue;
+    const y=fn(x); if(y===null) continue;
+    risultati.push(`${intervallo(a,b)} → ${y>0?positivo:y<0?negativo:"0"}`);
+  }
+  return risultati.join(" | ") || "Non determinabile";
+}
+export function calcolaSegno(input:string):string {return segni(input,0,"+","-");}
+export function calcolaCrescenza(input:string):string {try{return segni(input,1,"crescente","decrescente");}catch{return "Non determinabile";}}
+export function calcolaConcavita(input:string):string {try{return segni(input,2,"convessa","concava");}catch{return "Non determinabile";}}
+function cambi(input:string,ordine:number):{x:number;sinistra:number;destra:number}[] {
+  const m=modello(input), fn=compila(derivataNode(input,ordine)), roots=punti(input,ordine);
+  return roots.flatMap((x,i)=> {
+    const vicino=Math.min(...[...m.confini,...roots.filter((_,j)=>i!==j)].map(v=>Math.abs(v-x)),1);
+    const h=Math.min(1e-4,vicino/4);
+    if(h<=0 || m.fn(x-h)===null || m.fn(x+h)===null) return [];
+    const l=fn(x-h),r=fn(x+h);
+    return l!==null && r!==null && l*r<0 ? [{x,sinistra:l,destra:r}] : [];
+  });
+}
+export function calcolaFlessi(input:string):string {try{return coordinate(input,cambi(input,2).map(p=>p.x))||"Nessun flesso trovato in [-100, 100]";}catch{return "Non determinabile";}}
+export function calcolaMassimiMinimi(input:string):string {try{return cambi(input,1).map(p=>`${p.sinistra<0?"minimo":"massimo"} relativo: ${coordinate(input,[p.x])}`).join(" ; ")||"Nessun estremo stazionario trovato in [-100, 100]";}catch{return "Non determinabile";}}
+export function calcolaAsintotiVerticali(input:string):string {
+  const m=modello(input);
+  const xs=m.confini.filter(x=>[-1,1].some(s=> {
+    const ys=[1e-3,1e-5,1e-7].map(h=>m.fn(x+s*h));
+    return ys.every(y=>y!==null) && Math.abs(ys[2]!)>Math.abs(ys[1]!)*1.2 && Math.abs(ys[1]!)>Math.abs(ys[0]!)*1.2;
+  }));
+  return xs.map(x=>`x = ${testo(x)} (stima numerica)`).join(" ; ")||"Nessun asintoto verticale trovato";
+}
+export function calcolaAsintotiOrizzontali(input:string):string {
+  const fn=modello(input).fn, res:string[]=[];
+  for(const s of [-1,1]) {
+    const ys=[1e4,1e5,1e6].map(x=>fn(s*x));
+    if(ys.every(y=>y!==null) && Math.abs(ys[2]!-ys[1]!)<1e-4 && Math.abs(ys[1]!-ys[0]!)<1e-3)
+      res.push(`y ≈ ${testo(ys[2]!)} per x → ${s<0?"-∞":"+∞"}`);
+  } return res.join(" | ")||"Nessun asintoto orizzontale trovato";
+}
+export function calcolaAsintotiObliqui(input:string):string {
+  const fn=modello(input).fn,res:string[]=[];
+  for(const s of [-1,1]) {
+    const x=s*1e5,y1=fn(x),y2=fn(2*x),y3=fn(4*x);
+    if(y1===null || y2===null || y3===null) continue;
+    const m=(y2-y1)/x,q=y1-m*x;
+    // Terzo campione indipendente: due punti definiscono sempre una retta.
+    if(Math.abs(m)>1e-6 && Math.abs(y3-(m*4*x+q))<1e-3)
+      res.push(`y ≈ ${testo(m)}x ${q<0?"-":"+"} ${testo(Math.abs(q))} per x → ${s<0?"-∞":"+∞"}`);
+  }return res.join(" | ")||"Nessun asintoto obliquo trovato";
+}
+export function calcolaStudioCompleto(input:string) {
+  albero(input); // Un input errato deve raggiungere il messaggio di errore della pagina.
+  return {funzione:input,dominio:calcolaDominio(input),intersezioniX:calcolaIntersezioniX(input),intersezioneY:calcolaIntersezioneY(input),segno:calcolaSegno(input),derivataPrima:calcolaDerivata(input),puntiCritici:calcolaPuntiCritici(input),crescenza:calcolaCrescenza(input),estremi:calcolaMassimiMinimi(input),derivataSeconda:calcolaDerivataSeconda(input),concavita:calcolaConcavita(input),flessi:calcolaFlessi(input),asintotiVerticali:calcolaAsintotiVerticali(input),asintotiOrizzontali:calcolaAsintotiOrizzontali(input),asintotiObliqui:calcolaAsintotiObliqui(input)};
+}
+
+export function campionaGrafico(input:string,min=-8,max=8,numero=1600):Array<Array<[number,number]>> {
+  if(!Number.isFinite(min)||!Number.isFinite(max)||max<=min) throw new Error("Finestra non valida");
+  const m=modello(input), tratti:Array<Array<[number,number]>>=[];
+  let tratto:Array<[number,number]>=[], precedente:number|null=null;
+  const n=Math.max(2,Math.min(10000,Math.floor(numero)));
+  for(let i=0;i<=n;i++) {
+    const x=min+(max-min)*i/n,y=m.fn(x);
+    const taglio=precedente!==null && m.confini.some(b=>b>precedente! && b<=x);
+    if(y===null || taglio) {if(tratto.length>1)tratti.push(tratto);tratto=[];}
+    if(y!==null) tratto.push([x,y]); precedente=x;
+  }
+  if(tratto.length>1)tratti.push(tratto);return tratti;
 }
