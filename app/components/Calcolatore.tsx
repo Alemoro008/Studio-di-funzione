@@ -103,9 +103,7 @@ function spiegazioneIntersezioneY(
   return "Per trovare l'intersezione con l'asse y si pone x = 0.";
 }
 
-function spiegazioneSegno(
-  risultato: string
-) {
+function spiegazioneSegno() {
   return "Il segno si determina dividendo il dominio nei punti in cui la funzione è nulla o non è definita e verificando il segno in ciascun intervallo.";
 }
 
@@ -125,9 +123,7 @@ function spiegazionePuntiCritici(
   return "I punti critici sono ottenuti cercando gli zeri della derivata prima che appartengono al dominio.";
 }
 
-function spiegazioneCrescenza(
-  risultato: string
-) {
+function spiegazioneCrescenza() {
   return "La funzione è crescente dove f'(x) > 0 e decrescente dove f'(x) < 0. Gli eventuali valori esclusi dal dominio separano gli intervalli.";
 }
 
@@ -182,7 +178,7 @@ function spiegazioneAsintotoOrizzontale(
   if (
     risultato.includes("Nessun")
   ) {
-    return "La funzione non tende a un valore finito per x che tende a ±∞.";
+    return "I campioni numerici non hanno individuato un asintoto orizzontale. Per una conclusione analitica calcola i limiti nelle direzioni ammesse dal dominio.";
   }
 
   return "L'asintoto orizzontale si determina studiando il limite della funzione per x → +∞ e x → -∞.";
@@ -204,11 +200,11 @@ function spiegazioneAsintotoObliquo(
    COMPONENTE
    ========================================================= */
 
-export default function Home() {
+export default function Calcolatore({ iniziale = "" }: { iniziale?: string }) {
   const [
     funzione,
     setFunzione,
-  ] = useState("");
+  ] = useState(iniziale);
 
   const [
     risultato,
@@ -267,12 +263,12 @@ export default function Home() {
 </p>
 
 <h1 className="text-5xl font-bold tracking-tight text-gray-900">
-  Studio di funzione completo in pochi secondi
+  Studia una funzione, comprendi ogni passaggio
 </h1>
 
 <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600">
-  Inserisci una funzione e ottieni uno studio completo e spiegato
-  passo dopo passo: dominio, intersezioni, segno, derivate,
+  Inserisci una funzione e confronta i tuoi calcoli:
+  dominio, intersezioni, segno, derivate,
   crescenza, massimi e minimi, concavità, flessi e asintoti.
 </p>
 
@@ -284,11 +280,14 @@ export default function Home() {
 
         <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-gray-200 p-6 shadow-sm">
 
-          <label className="mb-3 block font-medium text-gray-800">
+          <label htmlFor="funzione" className="mb-3 block font-medium text-gray-800">
             Inserisci la funzione
           </label>
 
           <input
+            id="funzione"
+            maxLength={300}
+            aria-describedby="sintassi-funzione"
             type="text"
             value={funzione}
             onChange={(e) =>
@@ -306,6 +305,9 @@ export default function Home() {
             placeholder="Es. (x^2 - 4) / (x - 2)"
             className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-500 outline-none focus:border-blue-500"
           />
+          <p id="sintassi-funzione" className="mt-3 text-sm leading-6 text-slate-600">Scrivi * per il prodotto, ^ per le potenze, sqrt(x) per la radice e ln(x) per il logaritmo naturale. Usa parentesi intorno a tutto il denominatore.</p>
+          <div className="mt-4 flex flex-wrap gap-2" aria-label="Funzioni di esempio">{["x^3-3*x", "x^2/(x-1)", "ln(x)/x", "x*exp(-x)"].map(esempio => <button type="button" key={esempio} onClick={() => { setFunzione(esempio); setRisultato(null); setErrore(""); }} className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-blue-700">{esempio}</button>)}</div>
+          <p className="mt-4 text-sm leading-6 text-slate-600">Le derivate sono simboliche; zeri, estremi e flessi possono richiedere ricerche numeriche limitate. <Link href="/metodo-e-limiti" className="text-blue-700 underline">Leggi cosa può verificare il calcolatore.</Link></p>
 
           {funzione && (
             <div
@@ -342,7 +344,7 @@ export default function Home() {
               ================================================= */}
 
           {errore && (
-            <div className="mt-6 rounded-xl bg-red-50 p-4 text-left text-red-700">
+            <div role="alert" className="mt-6 rounded-xl bg-red-50 p-4 text-left text-red-700">
               {errore}
             </div>
           )}
@@ -450,9 +452,7 @@ export default function Home() {
                 </p>
 
                 <p className="mt-3 text-sm text-gray-500">
-                  {spiegazioneSegno(
-                    risultato.segno
-                  )}
+                  {spiegazioneSegno()}
                 </p>
 
               </div>
@@ -514,9 +514,7 @@ export default function Home() {
                 </p>
 
                 <p className="mt-3 text-sm text-gray-500">
-                  {spiegazioneCrescenza(
-                    risultato.crescenza
-                  )}
+                  {spiegazioneCrescenza()}
                 </p>
 
               </div>
@@ -668,92 +666,6 @@ export default function Home() {
 
         </div>
 
-{/* =================================================
-    CONTENUTO INFORMATIVO SEO
-    ================================================= */}
-
-<section className="mx-auto mt-20 max-w-4xl">
-
-  <div className="text-center">
-    <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-      Studio di funzione online
-    </h2>
-
-    <p className="mx-auto mt-4 max-w-2xl text-gray-600">
-      Uno strumento gratuito per studiare una funzione matematica
-      passo dopo passo e comprendere i principali elementi dell&apos;analisi.
-    </p>
-  </div>
-
-  <div className="mt-10 grid gap-6 md:grid-cols-2">
-
-    <div className="rounded-2xl border border-gray-200 p-6">
-      <h3 className="text-xl font-semibold text-gray-900">
-        Dominio di una funzione
-      </h3>
-
-      <p className="mt-3 text-gray-600">
-        Il dominio è l&apos;insieme dei valori di x per cui una funzione
-        è definita. Per determinarlo bisogna individuare eventuali
-        denominatori nulli, radicandi negativi o altre condizioni
-        che limitano i valori ammessi.
-      </p>
-    </div>
-
-    <div className="rounded-2xl border border-gray-200 p-6">
-      <h3 className="text-xl font-semibold text-gray-900">
-        Derivata prima
-      </h3>
-
-      <p className="mt-3 text-gray-600">
-        La derivata prima permette di studiare la crescita e la
-        decrescita della funzione e di individuare eventuali
-        punti critici, massimi e minimi relativi.
-      </p>
-    </div>
-
-    <div className="rounded-2xl border border-gray-200 p-6">
-      <h3 className="text-xl font-semibold text-gray-900">
-        Limiti e asintoti
-      </h3>
-
-      <p className="mt-3 text-gray-600">
-        Lo studio dei limiti permette di analizzare il comportamento
-        della funzione vicino ai punti esclusi dal dominio e per x
-        che tende a più o meno infinito, individuando eventuali
-        asintoti verticali, orizzontali e obliqui.
-      </p>
-    </div>
-
-    <div className="rounded-2xl border border-gray-200 p-6">
-      <h3 className="text-xl font-semibold text-gray-900">
-        Segno, concavità e flessi
-      </h3>
-
-      <p className="mt-3 text-gray-600">
-        Lo studio del segno permette di capire dove la funzione è
-        positiva o negativa. La derivata seconda permette invece
-        di analizzare concavità, convessità ed eventuali punti di
-        flesso.
-      </p>
-    </div>
-
-  </div>
-
-  <div className="mt-10 rounded-2xl bg-gray-50 p-6 text-center">
-    <h3 className="text-xl font-semibold text-gray-900">
-      Come fare uno studio di funzione?
-    </h3>
-
-    <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-      Inserisci la funzione nel calcolatore qui sopra per ottenere
-      automaticamente dominio, intersezioni con gli assi, studio
-      del segno, derivate, punti critici, crescenza, concavità,
-      flessi e asintoti.
-    </p>
-  </div>
-
-</section>
         <p className="mt-8 text-center text-sm text-gray-500">
           Gratuito • Pensato per studenti delle scuole superiori
         </p>
