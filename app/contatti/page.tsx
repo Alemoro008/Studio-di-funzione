@@ -30,6 +30,9 @@ export default function Contatti() {
             problemi negli strumenti di calcolo o suggerimenti per
             migliorare i contenuti.
           </p>
+          <section><h2 className="mb-3 text-xl font-semibold">Scrivi ad Alessandro</h2><p>Per segnalare un errore, indica l’indirizzo della pagina, la formula completa con le parentesi, il risultato visualizzato e il passaggio che ritieni da correggere. Se riguarda il grafico, aggiungi l’intervallo in cui osservi il problema. Per un problema di utilizzo è utile sapere se stai navigando da telefono o computer.</p></section>
+          <section><h2 className="mb-3 text-xl font-semibold">Richieste sulla privacy</h2><p>Puoi usare la stessa email per domande sul trattamento dei dati e richieste relative ai tuoi messaggi. Invia soltanto le informazioni necessarie: non servono documenti d’identità, dati della scuola o nomi di altri studenti per segnalare un errore matematico.</p></section>
+          <p>L’indirizzo apre il tuo programma di posta. Il sito non dispone di un modulo di invio e non invia messaggi automaticamente.</p>
         </div>
       </div>
     </main>
