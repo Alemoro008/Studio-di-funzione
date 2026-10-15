@@ -14,6 +14,7 @@ export default function PrivacyPolicy() {
         </h1>
 
         <div className="space-y-6">
+          <p className="text-sm text-gray-600">Aggiornamento: 15 ottobre 2026. Referente del progetto: Alessandro · <a className="underline" href="mailto:008alemoro@gmail.com">008alemoro@gmail.com</a>.</p>
           <p>
             Questa informativa descrive le modalità di gestione del sito
             Studio di Funzione in riferimento al trattamento dei dati
@@ -29,6 +30,7 @@ export default function PrivacyPolicy() {
               di fornire direttamente dati personali per utilizzare gli
               strumenti di calcolo e i contenuti didattici disponibili.
             </p>
+            <p className="mt-3">Il calcolo delle formule e il disegno dei grafici avvengono nel browser. Non è presente un archivio delle espressioni inserite né vengono richieste risposte agli esercizi. Se apri un collegamento con una formula nel parametro f dell’indirizzo, quel parametro fa parte dell’URL richiesto al servizio di hosting: usa soltanto espressioni matematiche e non inserirvi informazioni personali.</p>
           </section>
 
           <section>
@@ -49,10 +51,7 @@ export default function PrivacyPolicy() {
               Cookie e tecnologie simili
             </h2>
             <p>
-              Il sito può utilizzare cookie tecnici necessari al suo
-              funzionamento e, previo consenso quando richiesto dalla
-              normativa applicabile, cookie o tecnologie simili utilizzati
-              da servizi di terze parti.
+              Il codice applicativo non imposta cookie pubblicitari o di analisi e non salva formule o risposte nel localStorage. L’infrastruttura di hosting può trattare dati tecnici per erogazione e sicurezza. I font sono distribuiti dal sito: non viene caricata una pagina di Google Fonts dal browser del visitatore.
             </p>
           </section>
 
@@ -109,13 +108,11 @@ export default function PrivacyPolicy() {
               Servizi di terze parti
             </h2>
             <p>
-              Il sito può avvalersi di servizi forniti da soggetti terzi
-              necessari per l&apos;hosting, la sicurezza, la pubblicità o
-              altre funzionalità tecniche. Tali soggetti possono trattare
-              dati secondo le proprie informative e nel rispetto della
-              normativa applicabile.
+              L’hosting è fornito da Vercel, che gestisce richieste HTTP e dati tecnici secondo la propria <a href="https://vercel.com/legal/privacy-policy" className="underline">informativa sulla privacy</a>. Le pagine possono contenere collegamenti esterni: il relativo servizio riceve una richiesta quando scegli di aprirli. Non sono incorporati video, social widget o moduli esterni.
             </p>
           </section>
+          <section><h2 className="text-xl font-semibold mb-2">Messaggi email e conservazione</h2><p>Se contatti Alessandro, il tuo indirizzo e il contenuto del messaggio vengono trattati per rispondere alla richiesta, gestire segnalazioni e mantenere la corrispondenza necessaria. Non sono usati per newsletter. La posta è gestita tramite Gmail; la relativa <a href="https://policies.google.com/privacy?hl=it" className="underline">informativa di Google</a> descrive il servizio. I messaggi vengono conservati per il tempo necessario alla gestione della richiesta e di eventuali obblighi applicabili; puoi chiedere informazioni o la cancellazione scrivendo allo stesso indirizzo.</p></section>
+          <section><h2 className="text-xl font-semibold mb-2">Richieste e diritti</h2><p>Per informazioni sui tuoi dati puoi scrivere a 008alemoro@gmail.com. Nei casi previsti puoi richiedere accesso, rettifica, cancellazione, limitazione, opposizione e portabilità, nonché proporre reclamo all’autorità di controllo competente. Il riferimento italiano è il <a href="https://www.garanteprivacy.it/" className="underline">Garante per la protezione dei dati personali</a>.</p></section>
 
           <section>
             <h2 className="text-xl font-semibold mb-2">
