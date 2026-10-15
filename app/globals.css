@@ -12,15 +12,26 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+html { scroll-behavior: smooth; }
+* { overflow-wrap: anywhere; }
+a, button, input, summary { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 3px solid #2563eb; outline-offset: 4px; }
+summary { min-height: 32px; }
+.skip-link { position: fixed; top: -100px; left: 16px; z-index: 100; padding: 12px 20px; background: #1d4ed8; color: white; border-radius: 8px; }
+.skip-link:focus { top: 12px; }
+.eyebrow { font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #1d4ed8; }
+.study-card { display: flex; flex-direction: column; gap: 12px; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; transition: border-color .15s, background .15s; }
+.study-card:hover { border-color: #93c5fd; background: #f8fafc; }
+.study-card h3 { font-weight: 700; font-size: 1.125rem; line-height: 1.5; }
+.study-card p { color: #475569; line-height: 1.8; }
+.study-card span { color: #1d4ed8; font-weight: 600; margin-top: auto; font-size: .875rem; }
+.formula { overflow-wrap: anywhere; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding-block: .5rem; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+@media print { header, footer, .skip-link { display: none; } details > * { display: block !important; } article { max-width: none !important; } }
