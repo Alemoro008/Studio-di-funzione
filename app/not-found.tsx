@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound() { return <main className="mx-auto max-w-3xl px-6 py-20"><p className="eyebrow">Errore 404</p><h1 className="mt-4 text-4xl font-bold">Questa pagina non è disponibile</h1><p className="mt-6 leading-8 text-slate-600">Il collegamento potrebbe essere incompleto. Riparti dal percorso di studio per trovare guide, esempi ed esercizi.</p><Link href="/lezioni" className="mt-8 inline-block rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white">Vai alle lezioni</Link></main>; }

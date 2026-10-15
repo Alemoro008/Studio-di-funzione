@@ -1,0 +1,14 @@
+import Link from "next/link";
+import { lezioni } from "../../lib/lezioni";
+export const metadata = { title: "Lezioni di analisi e studi di funzione svolti", description: "Un percorso dal dominio al grafico: guide, sette studi completi ed esercizi con soluzioni ragionate.", alternates: { canonical: "/lezioni" } };
+const fondamentali = [
+  ["/studio-di-funzione", "Il metodo completo", "L’ordine dei passaggi e come collegare i risultati."],
+  ["/dominio-di-una-funzione", "1. Dominio", "Interseca i vincoli di denominatori, radici e logaritmi."],
+  ["/segno-di-una-funzione", "2. Segno e intersezioni", "Costruisci una tabella senza perdere fattori o zeri."],
+  ["/limiti-e-asintoti", "3. Limiti e asintoti", "Distingui limiti laterali, buchi e rette asintotiche."],
+  ["/derivata-prima", "4. Derivate ed estremi", "Dal segno di f′ a crescenza, massimi e minimi."],
+];
+export default function Lezioni() { return <main className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16"><p className="eyebrow">Il percorso di studio</p><h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">Capire i passaggi. Poi controllare il risultato.</h1><p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600">Parti dai fondamentali se stai iniziando, oppure scegli uno studio svolto e confronta il tuo procedimento. Ogni argomento collega formule, ragionamento e grafico. Le soluzioni degli esercizi si aprono solo quando sei pronto a leggerle.</p>
+<section className="mt-12"><h2 className="text-2xl font-bold">Inizia dalle basi</h2><div className="mt-5 grid gap-4 sm:grid-cols-2">{fondamentali.map(([href,t,p])=><Link href={href} key={href} className="study-card"><h3>{t}</h3><p>{p}</p><span>Leggi la guida →</span></Link>)}</div></section>
+{(["Metodo", "Studio svolto"] as const).map(c=><section key={c} className="mt-12"><h2 className="text-2xl font-bold">{c === "Metodo" ? "Approfondisci il ragionamento" : "Passa agli studi completi"}</h2>{c === "Studio svolto" && <p className="mt-4 leading-7 text-slate-600"><Link href="/studi-di-funzione-svolti" className="text-blue-700 underline">Comincia dai tre esempi di base: x³ − 3x, x²/(x − 1) e ln(x)/x.</Link> Poi affronta i quattro casi seguenti.</p>}<div className="mt-5 grid gap-4 sm:grid-cols-2">{lezioni.filter(l=>l.categoria===c).map(l=><Link key={l.slug} href={`/lezioni/${l.slug}`} className="study-card"><h3>{l.titolo}</h3><p>{l.descrizione}</p><span>{c === "Metodo" ? "Leggi la lezione" : "Segui lo svolgimento"} →</span></Link>)}</div></section>)}
+<section className="mt-12 rounded-2xl bg-blue-50 p-7"><h2 className="text-2xl font-bold">Prova senza guardare la soluzione</h2><p className="mt-3 leading-7">Dodici esercizi graduati: dominio, segno, estremi, flessi e uno studio completo. Scrivi il tuo procedimento, poi confronta ogni passaggio.</p><Link className="mt-5 inline-block font-semibold text-blue-700 underline" href="/esercizi">Apri gli esercizi →</Link></section></main>; }
