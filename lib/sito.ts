@@ -1,5 +1,5 @@
 import { lezioni } from "./lezioni";
-export const sitoUrl = "https://studio-di-funzione.vercel.app";
+export const sitoUrl = "https://studio-di-funzione-alessandro.netlify.app";
 export const pagine = [
   { percorso: "/", titolo: "Calcolatore" },
   { percorso: "/lezioni", titolo: "Lezioni e studi svolti" },
